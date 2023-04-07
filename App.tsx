@@ -4,18 +4,22 @@ import {
   Karla_400Regular,
   Karla_700Bold,
 } from "@expo-google-fonts/karla";
+import { NativeBaseProvider } from 'native-base';
+import { Loading } from "@components/Loading";
+import { THEME } from './src/theme';
+import { SignIn } from "@screens/SignIn";
 
 export default function App() {
   const [fontsLoader] = useFonts({ Karla_400Regular, Karla_700Bold });
 
   return (
-    <View>
+    <NativeBaseProvider theme={THEME}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"
         translucent
       />
-      {fontsLoader ? <Text>MARKETSPACE 💜</Text> : <View />}
-    </View>
+      {fontsLoader ? <SignIn/> : <Loading />}
+    </NativeBaseProvider>
   );
 }
