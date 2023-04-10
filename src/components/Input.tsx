@@ -6,6 +6,7 @@ export function Input({ ...rest }: IInputProps) {
       bg="gray.7"
       h={11}
       px={12}
+      mb={4}
       borderWidth={0}
       fontFamily="body"
       fontSize="sm"
