@@ -5,12 +5,15 @@ import { Input } from "@components/Input";
 import { TouchableOpacity } from "react-native";
 import { useState } from "react";
 import { Button } from "@components/Button";
+import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
+import { useNavigation } from "@react-navigation/native";
 
 export function SignIn() {
   const [show, setShow] = useState(false);
+  const navigation = useNavigation<AuthNavigatorRoutesProps>()
 
-  function handleLogon() {
-    return console.log("Click=> Button Entrar");
+  function handleNewAccount(){
+    navigation.navigate('signUp')
   }
 
   return (
@@ -55,16 +58,16 @@ export function SignIn() {
               }
               placeholder="Senha"
             />
-            <Button title="Entrar" mt={8} onPress={handleLogon} mb={16} />
+            <Button title="Entrar" mt={8} mb={16} />
           </Center>
         </VStack>
 
         <VStack bg="gray.7" px={12} mb={10}>
           <Center>
-            <Text pt={16} fontFamily="body" fontSize="sm" color="gray.2">
+            <Text pt={16} fontFamily="body" fontSize="sm" color="gray.2" >
               Ainda não tem acesso?
             </Text>
-            <Button mt={4} title="Criar uma conta" variant="solid" />
+            <Button mt={4} title="Criar uma conta" variant="solid" onPress={handleNewAccount}/>
           </Center>
         </VStack>
       </VStack>

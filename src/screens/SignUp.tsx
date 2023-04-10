@@ -16,12 +16,14 @@ import { useState } from "react";
 import { Button } from "@components/Button";
 import EditButtonSVG from "@assets/buttonEdit.svg";
 import userPhotoDefault from "@assets/userPhotoDefault.png";
+import { useNavigation } from "@react-navigation/native";
 
 export function SignUp() {
   const [show, setShow] = useState(false);
+  const navigation = useNavigation()
 
-  function handleLogon() {
-    return console.log("Click=> Button Criar");
+  function handleGoBack(){
+    navigation.goBack()
   }
 
   return (
@@ -108,12 +110,12 @@ export function SignUp() {
               placeholder="Confirmar senha"
             />
 
-            <Button title="Criar" bgColor='gray.1' mt={6} onPress={handleLogon} mb={12} />
+            <Button title="Criar" bgColor='gray.1' mt={6} mb={12} />
 
             <Text fontFamily="body" fontSize="sm" color="gray.2">
               Já tem uma conta?
             </Text>
-            <Button my={4} title="Ir para o login" variant="solid" />
+            <Button my={4} title="Ir para o login" variant="solid" onPress={handleGoBack}/>
           </Center>
         </VStack>
       </VStack>
