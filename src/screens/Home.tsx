@@ -6,13 +6,14 @@ import { TouchableOpacity } from "react-native";
 import { Input } from "@components/Input";
 import { FontAwesome } from "@expo/vector-icons";
 import { Sliders } from "phosphor-react-native";
+import { ProductCard } from "@components/ProductCard";
 
 export function Home() {
   return (
     <Center px={6} bg='gray.6'>
       <HomeHeader />
 
-      <VStack mt={8} width="full">
+      <VStack my={8} width="full">
         <Text mb={3}>Seus produtos anunciados para venda </Text>
 
         <TouchableOpacity>
@@ -71,6 +72,8 @@ export function Home() {
             </HStack>
           }
         />
+
+        <ProductCard />
       </VStack>
     </Center>
   );
