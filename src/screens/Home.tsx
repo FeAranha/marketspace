@@ -1,5 +1,14 @@
 import { HomeHeader } from "@components/HomeHeader";
-import { Center, HStack, Heading, Icon, Text, VStack } from "native-base";
+import {
+  Center,
+  FlatList,
+  HStack,
+  Heading,
+  Icon,
+  ScrollView,
+  Text,
+  VStack,
+} from "native-base";
 import { Octicons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
@@ -7,10 +16,21 @@ import { Input } from "@components/Input";
 import { FontAwesome } from "@expo/vector-icons";
 import { Sliders } from "phosphor-react-native";
 import { ProductCard } from "@components/ProductCard";
+import { useState } from "react";
 
 export function Home() {
+  const [produts, setProducts] = useState([
+    "Bicicleta",
+    "Sofa",
+    "Tenis",
+    "Armario",
+    "Luminaria",
+    "Bota",
+    "Camisa",
+  ]);
+
   return (
-    <Center px={6} bg='gray.6'>
+    <Center px={6} bg="gray.6">
       <HomeHeader />
 
       <VStack my={8} width="full">
@@ -52,6 +72,7 @@ export function Home() {
 
         <Input
           mt={3}
+          mb={6}
           placeholder="Buscar anúncio"
           InputRightElement={
             <HStack>
@@ -67,13 +88,24 @@ export function Home() {
               <VStack borderRightWidth={0.5} bg="gray.4" mr={3} />
 
               <TouchableOpacity>
-                <Icon as={<Sliders />} mr="2"/>
+                <Icon as={<Sliders />} mr="2" />
               </TouchableOpacity>
             </HStack>
           }
         />
-
-        <ProductCard />
+        <VStack justifyContent='space-between'>
+          <FlatList
+            data={produts}
+            numColumns={2}
+            keyExtractor={(item) => item}
+            renderItem={({ item }) => <ProductCard />}
+            showsVerticalScrollIndicator={false}
+            _contentContainerStyle={{
+              paddingBottom: 20,
+              padding: 1.5,              
+            }}
+          />
+        </VStack>
       </VStack>
     </Center>
   );
