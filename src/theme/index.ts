@@ -18,6 +18,9 @@ export const THEME = extendTheme({
             6: '#EDECEE',
             7: '#F7F7F8',
             100: '#F7F7F8',
+            200: '#3E3A40',
+            400: '#9F9BA1',
+            700: '#F7F7F8',
         }
     },
     fonts: {
