@@ -1,14 +1,13 @@
 import { HomeHeader } from "@components/HomeHeader";
 import {
-  Center,
   FlatList,
   HStack,
   Heading,
   Icon,
-  ScrollView,
   Text,
   VStack,
 } from "native-base";
+import { ScrollView } from 'react-native-virtualized-view';
 import { Octicons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
@@ -30,83 +29,86 @@ export function Home() {
   ]);
 
   return (
-    <Center px={6} bg="gray.6">
-      <HomeHeader />
+    <ScrollView contentContainerStyle={{ flexGrow: 1}} showsHorizontalScrollIndicator={false}>
+      <VStack flex={1} px={6} bg="gray.6">
+        <HomeHeader />
 
-      <VStack my={8} width="full">
-        <Text mb={3}>Seus produtos anunciados para venda </Text>
+        <VStack my={8}>
+          <Text mb={3}>Seus produtos anunciados para venda </Text>
 
-        <TouchableOpacity>
-          <HStack
-            alignItems="center"
-            background="blue.55"
-            rounded="md"
-            p={4}
-            justifyContent="space-between"
-          >
-            <Icon as={<Octicons name="tag" />} size={6} color="blue.7" />
+          <TouchableOpacity>
+            <HStack
+              alignItems="center"
+              background="blue.55"
+              rounded="md"
+              p={4}
+              justifyContent="space-between"
+            >
+              <Icon as={<Octicons name="tag" />} size={6} color="blue.7" />
 
-            <VStack>
-              <Heading fontFamily="heading" fontSize="lg" color="gray.2">
-                4
+              <VStack>
+                <Heading fontFamily="heading" fontSize="lg" color="gray.2">
+                  4
+                </Heading>
+                <Text mr={12} fontFamily="body" fontSize="xs" color="gray.2">
+                  anúncios ativos
+                </Text>
+              </VStack>
+
+              <Heading fontFamily="heading" fontSize="xs" color="blue.7">
+                Meus anúncios
               </Heading>
-              <Text mr={12} fontFamily="body" fontSize="xs" color="gray.2">
-                anúncios ativos
-              </Text>
-            </VStack>
-
-            <Heading fontFamily="heading" fontSize="xs" color="blue.7">
-              Meus anúncios
-            </Heading>
-            <Icon
-              as={<AntDesign name="arrowright" />}
-              size={5}
-              color="blue.7"
-            />
-          </HStack>
-        </TouchableOpacity>
-
-        <Text mt={8} fontFamily="body" fontSize="sm" color="gray.3">
-          Compre produtos variadoss
-        </Text>
-
-        <Input
-          mt={3}
-          mb={6}
-          placeholder="Buscar anúncio"
-          InputRightElement={
-            <HStack>
-              <TouchableOpacity>
-                <Icon
-                  as={<FontAwesome name="search" />}
-                  size={5}
-                  mr="2"
-                  color="gray.2"
-                />
-              </TouchableOpacity>
-
-              <VStack borderRightWidth={0.5} bg="gray.4" mr={3} />
-
-              <TouchableOpacity>
-                <Icon as={<Sliders />} mr="2" />
-              </TouchableOpacity>
+              <Icon
+                as={<AntDesign name="arrowright" />}
+                size={5}
+                color="blue.7"
+              />
             </HStack>
-          }
-        />
-        <VStack justifyContent='space-between'>
-          <FlatList
-            data={produts}
-            numColumns={2}
-            keyExtractor={(item) => item}
-            renderItem={({ item }) => <ProductCard />}
-            showsVerticalScrollIndicator={false}
-            _contentContainerStyle={{
-              paddingBottom: 20,
-              padding: 1.5,              
-            }}
+          </TouchableOpacity>
+
+          <Text mt={8} fontFamily="body" fontSize="sm" color="gray.3">
+            Compre produtos variados
+          </Text>
+
+          <Input
+            mt={3}
+            mb={6}
+            placeholder="Buscar anúncio"
+            InputRightElement={
+              <HStack>
+                <TouchableOpacity>
+                  <Icon
+                    as={<FontAwesome name="search" />}
+                    size={5}
+                    mr="2"
+                    color="gray.2"
+                  />
+                </TouchableOpacity>
+
+                <VStack borderRightWidth={0.5} bg="gray.4" mr={3} />
+
+                <TouchableOpacity>
+                  <Icon as={<Sliders />} mr="2" />
+                </TouchableOpacity>
+              </HStack>
+            }
           />
+
+          <VStack justifyContent="space-between">
+            <FlatList
+              data={produts}
+              numColumns={2}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => <ProductCard />}
+              showsVerticalScrollIndicator={false}
+              _contentContainerStyle={{
+                paddingBottom: 20,
+                padding: 1.5,
+              }}
+            />
+          </VStack>
         </VStack>
       </VStack>
-    </Center>
+    </ScrollView>
   );
 }

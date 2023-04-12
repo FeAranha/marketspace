@@ -1,9 +1,12 @@
-import { Center, Text } from "native-base";
+import { Center, Icon } from "native-base";
+import { ScreenHeader } from '@components/ScreenHeader';
+
 
 export function MyADs() {
   return (
-    <Center flex={1}>
-      <Text>My ADs</Text>
+    <Center >
+      <ScreenHeader title="Meus anúncios" variant="edit"/>
+
     </Center>
   );
 }

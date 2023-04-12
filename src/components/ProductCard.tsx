@@ -12,7 +12,7 @@ type Props = TouchableOpacityProps & {
 export function ProductCard({ ...rest }: Props) {
   const UserAvatar = AvatarUserImg;
   return (
-    <VStack w={150} bg="gray.6" mb={6} mr={8}>
+    <VStack w={155} bg="gray.6" mb={6} mr={8}>
       <TouchableOpacity style={{ padding: 4 }} {...rest}>
         <Image
           source={BikeImg}
