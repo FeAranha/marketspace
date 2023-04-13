@@ -16,8 +16,11 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Sliders } from "phosphor-react-native";
 import { ProductCard } from "@components/ProductCard";
 import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
 
 export function Home() {
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
   const [produts, setProducts] = useState([
     "Bicicleta",
     "Sofa",
@@ -28,6 +31,10 @@ export function Home() {
     "Camisa",
   ]);
 
+  function goMyADs(){
+    navigation.navigate('myads')
+  }
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1}} showsHorizontalScrollIndicator={false}>
       <VStack flex={1} px={6} bg="gray.6">
@@ -36,7 +43,7 @@ export function Home() {
         <VStack my={8}>
           <Text mb={3}>Seus produtos anunciados para venda </Text>
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={goMyADs}>
             <HStack
               alignItems="center"
               background="blue.55"

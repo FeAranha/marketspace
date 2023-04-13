@@ -5,7 +5,7 @@ import { ScreenHeader } from '@components/ScreenHeader';
 export function MyADs() {
   return (
     <Center >
-      <ScreenHeader title="Meus anúncios" variant="edit"/>
+      <ScreenHeader title="Meus anúncios" variant="plus"/>
 
     </Center>
   );

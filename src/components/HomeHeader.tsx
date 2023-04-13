@@ -26,7 +26,7 @@ export function HomeHeader({...rest}: Props) {
       </VStack>
       <Button
         leftIcon={<Icon as={AntDesign} name="plus" color="gray.7" />}
-        ml={10}
+        ml={8}
         w={35}
         title="Criar anúncio"
         bgColor="gray.1"
