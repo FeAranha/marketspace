@@ -9,24 +9,34 @@ import {
   VStack,
   Pressable,
   TextArea,
-  Checkbox,
-  Stack,
 } from "native-base";
 import { Feather } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { Input } from "@components/Input";
 import { useState } from "react";
 import { ScrollView } from "react-native-virtualized-view";
-import { CheckCircle, Circle } from "phosphor-react-native";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Checkbox } from "@components/Checkbox";
 
-export function CreateAD() {
+type Props = {
+  isNew?: boolean
+}
+
+export function CreateAD({isNew}: Props) {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const [textAreaValue, setTextAreaValue] = useState("Value Controlled");
+  const [isSelected, setSelection] = useState(false);
 
   function handleGoBack() {
     navigation.goBack();
   }
+
+  function handleCheck() {
+    setSelection(!isSelected);
+    console.log('=> ',isSelected)
+
+    //isNew = !isSelected;
+  }
+
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
@@ -94,39 +104,18 @@ export function CreateAD() {
           direction={{ base: "row", md: "row" }}
           justifyContent="space-between"
         >
-          <Checkbox
-            value="newProduct"
-            colorScheme="gray.6"
-            size="md"
-            icon={<Icon as={<Circle color="#9F9BA1" />} />}
-            defaultIsChecked
-            _checked={{
-              icon: <CheckCircle />,
-              bg: "#000",
-            }}
-          >
-            <Text fontFamily="body" fontSize="md" color="gray.2">
-              Produto novo
-            </Text>
-          </Checkbox>
-          <Checkbox
-            value="newProduct"
-            colorScheme="gray.6"
-            size="md"
-            icon={
-              <Icon
-                as={<MaterialCommunityIcons name="check-circle" color="#9F9BA1" />}
-              />
-            }
-            defaultIsChecked
-             _checked={{
-               icon: <MaterialCommunityIcons name="check"/>
-             }}
-          >
-            <Text fontFamily="body" fontSize="md" color="gray.2">
-              Produto usado
-            </Text>
-          </Checkbox>
+          <HStack alignItems='center'>
+          <Checkbox onPress={handleCheck} checked={isSelected} variant="new" />
+          <Text fontFamily="body" fontSize="md" color="gray.2">
+            Produto novo
+          </Text>
+          </HStack>
+          <HStack alignItems='center'>
+          <Checkbox onPress={handleCheck} checked={isSelected} variant="used"/>
+          <Text fontFamily="body" fontSize="md" color="gray.2">
+            Produto usado
+          </Text>
+          </HStack>
         </HStack>
       </VStack>
     </ScrollView>
