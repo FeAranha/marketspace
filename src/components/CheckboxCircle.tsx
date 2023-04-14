@@ -9,7 +9,7 @@ export interface Props extends TouchableOpacityProps {
   variant?: 'new' | 'used'
 }
 
-export function Checkbox({ checked = false, ...rest }: Props) {
+export function CheckboxCircle({ checked = false, ...rest }: Props) {
   return (
     <Stack m={2}>
       <TouchableOpacity
