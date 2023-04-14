@@ -19,7 +19,6 @@ export function Checkbox({ checked = false, ...rest }: Props) {
       >
         {checked ? (
            <CheckboxSvg /> 
-          
         ) : (
           <Icon as={<Circle color="#9F9BA1" />} />
         )}

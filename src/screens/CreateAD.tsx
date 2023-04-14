@@ -20,6 +20,7 @@ import { Checkbox } from "@components/Checkbox";
 export function CreateAD() {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const [isSelected, setSelection] = useState(false);
+  const [isNew, setisNew] = useState(false);
 
   function handleGoBack() {
     navigation.goBack();
@@ -27,8 +28,8 @@ export function CreateAD() {
 
   function handleCheck() {
     setSelection(!isSelected);
-    console.log('=> ',isSelected)
-
+    setisNew(!isNew)
+    console.log('Novo? ',isNew)
   }
 
   return (
