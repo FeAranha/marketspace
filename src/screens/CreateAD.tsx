@@ -17,13 +17,8 @@ import { useState } from "react";
 import { ScrollView } from "react-native-virtualized-view";
 import { Checkbox } from "@components/Checkbox";
 
-type Props = {
-  isNew?: boolean
-}
-
-export function CreateAD({isNew}: Props) {
+export function CreateAD() {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
-  const [textAreaValue, setTextAreaValue] = useState("Value Controlled");
   const [isSelected, setSelection] = useState(false);
 
   function handleGoBack() {
@@ -34,7 +29,6 @@ export function CreateAD({isNew}: Props) {
     setSelection(!isSelected);
     console.log('=> ',isSelected)
 
-    //isNew = !isSelected;
   }
 
   return (
@@ -105,13 +99,14 @@ export function CreateAD({isNew}: Props) {
           justifyContent="space-between"
         >
           <HStack alignItems='center'>
-          <Checkbox onPress={handleCheck} checked={isSelected} variant="new" />
+          <Checkbox onPress={handleCheck} checked={!isSelected} />
+          {console.log()}
           <Text fontFamily="body" fontSize="md" color="gray.2">
             Produto novo
           </Text>
           </HStack>
           <HStack alignItems='center'>
-          <Checkbox onPress={handleCheck} checked={isSelected} variant="used"/>
+          <Checkbox onPress={handleCheck} checked={isSelected} />
           <Text fontFamily="body" fontSize="md" color="gray.2">
             Produto usado
           </Text>
