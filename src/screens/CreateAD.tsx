@@ -19,6 +19,7 @@ import { Input } from "@components/Input";
 import { useState } from "react";
 import { ScrollView } from "react-native-virtualized-view";
 import { CheckboxCircle } from "@components/CheckboxCircle";
+import { Button } from "@components/Button";
 
 export function CreateAD() {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
@@ -35,6 +36,12 @@ export function CreateAD() {
     setSelection(!isSelected);
     setisNew(!isNew);
   }
+
+  function goMyADs(){
+    navigation.navigate('myads')
+  }
+
+  function goPreviewAD() {}
 
   return (
     <ScrollView
@@ -143,30 +150,52 @@ export function CreateAD() {
         <Heading mt={4} fontFamily="heading" fontSize="sm" color="gray.2">
           Meios de pagamento aceitos
         </Heading>
-        
+
         <Checkbox.Group
           onChange={setGroupValues}
           value={groupValues}
           accessibilityLabel="choose numbers"
         >
           <Checkbox value="boleto" my={1}>
-            <Text fontFamily='body' fontSize='md'>Boleto</Text>
+            <Text fontFamily="body" fontSize="md">
+              Boleto
+            </Text>
           </Checkbox>
           <Checkbox value="pix" my={1}>
-          <Text fontFamily='body' fontSize='md'>Pix</Text>
+            <Text fontFamily="body" fontSize="md">
+              Pix
+            </Text>
           </Checkbox>
           <Checkbox value="dinheiro" my={1}>
-          <Text fontFamily='body' fontSize='md'>Dinheiro</Text>
+            <Text fontFamily="body" fontSize="md">
+              Dinheiro
+            </Text>
           </Checkbox>
           <Checkbox value="cartaoCredito" my={1}>
-          <Text fontFamily='body' fontSize='md'>Cartão de Crédito</Text>
+            <Text fontFamily="body" fontSize="md">
+              Cartão de Crédito
+            </Text>
           </Checkbox>
           <Checkbox value="depBancario" my={1}>
-          <Text fontFamily='body' fontSize='md'>Depósito Bancário</Text>
-          </Checkbox>  
+            <Text fontFamily="body" fontSize="md">
+              Depósito Bancário
+            </Text>
+          </Checkbox>
         </Checkbox.Group>
-        {console.log('selecionados:', groupValues)}
       </VStack>
+
+      <HStack
+        bg="gray.7"
+        w="full"
+        h={90}
+        alignItems="center"
+        p={6}
+        justifyContent="space-between"
+      >
+        <Button w={40}  title="Cancelar" variant="solid" onPress={goMyADs} />
+
+        <Button w={40} title="Acançar" bgColor="gray.1" onPress={goPreviewAD} />
+      </HStack>
     </ScrollView>
   );
 }
