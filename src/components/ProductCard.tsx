@@ -11,21 +11,22 @@ type Props = TouchableOpacityProps & {
 
 export function ProductCard({ ...rest }: Props) {
   const UserAvatar = AvatarUserImg;
+
   return (
-    <VStack w={155} bg="gray.6" mb={6} mr={8}>
-      <TouchableOpacity style={{ padding: 4 }} {...rest}>
+    <VStack bg="gray.6" mb={6}>
+      <TouchableOpacity style={{ padding: 4, }} {...rest}>
         <Image
           source={BikeImg}
           alt="Bicicleta de corrida preta com aro e guidão vermelho, ao fundo o por do sol de frente para água"
-          w={150}
           h={100}
+          w={40}
           rounded="md"
           resizeMode="contain"
           position="absolute"
         />
-        <HStack justifyContent="space-between" mb={20}>
+        <HStack justifyContent="space-between" flex={1} mb={20}>
           <Image source={UserAvatar} size={6} alt="avatar" />
-          <Box h={4} w={10} alignItems="center" rounded="full" bg="blue.7">
+          <Box mr={-6} h={4} w={10} alignItems="center" rounded="full" bg="blue.7">
             <Text fontFamily="heading" fontSize="ss" color="white">
               NOVO
             </Text>
@@ -39,7 +40,7 @@ export function ProductCard({ ...rest }: Props) {
             R$
           </Heading>
           <Heading fontFamily="heading" fontSize="md">
-            2.800,00
+            2.880,00
           </Heading>
         </HStack>
       </TouchableOpacity>

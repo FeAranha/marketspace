@@ -1,4 +1,4 @@
-import { Heading, HStack, Text, VStack, Image, Icon } from "native-base";
+import { Heading, HStack, Text, VStack, Image, Icon, Spacer } from "native-base";
 import AvatarImg from "@assets/avatar.png";
 import { Button } from "./Button";
 import { AntDesign } from "@expo/vector-icons";
@@ -14,8 +14,8 @@ export function HomeHeader({...rest}: Props) {
     navigation.navigate('createad')
   }
   return (
-    <HStack px={6} mt={12} alignItems="center" justifyContent="space-between">
-      <Image mr={4} source={AvatarImg} alt="avatar" />
+    <HStack mt={12} alignItems="center" justifyContent='space-between'>
+      <Image source={AvatarImg} alt="avatar" size={45}/>
       <VStack>
         <Text fontFamily="body" fontSize="md" color="gray.1">
           Boas vindas,

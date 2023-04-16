@@ -145,7 +145,6 @@ export function CreateAD() {
             Aceita troca?
           </Heading>
           <Switch size="lg" onChange={() => setisTraded(!isTraded)} />
-          {console.log("É trocavel? ", isTraded)}
         </VStack>
         <Heading mt={4} fontFamily="heading" fontSize="sm" color="gray.2">
           Meios de pagamento aceitos

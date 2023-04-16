@@ -38,9 +38,10 @@ export function Home() {
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1}} showsHorizontalScrollIndicator={false}>
       <VStack flex={1} px={6} bg="gray.6">
-        <HomeHeader />
+        <HomeHeader/>
 
         <VStack my={8}>
+          
           <Text mb={3}>Seus produtos anunciados para venda </Text>
 
           <TouchableOpacity onPress={goMyADs}>
@@ -101,12 +102,11 @@ export function Home() {
             }
           />
 
-          <VStack justifyContent="space-between">
             <FlatList
               data={produts}
               numColumns={2}
               keyExtractor={(item) => item}
-              renderItem={({ item }) => <ProductCard />}
+              renderItem={({ item }) => <HStack w='50%' ml={1}><ProductCard /></HStack>}
               showsVerticalScrollIndicator={false}
               _contentContainerStyle={{
                 paddingBottom: 20,
@@ -115,7 +115,7 @@ export function Home() {
             />
           </VStack>
         </VStack>
-      </VStack>
+      
     </ScrollView>
   );
 }
