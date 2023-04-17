@@ -1,4 +1,4 @@
-import { Center, HStack, Heading, Icon } from "native-base";
+import { HStack, Heading, Icon } from "native-base";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
