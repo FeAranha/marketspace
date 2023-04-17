@@ -3,6 +3,7 @@ import { MyADs } from "@screens/MyADs";
 import { Home } from "@screens/Home";
 import { Logoff } from "@screens/Logoff";
 import { CreateAD } from "@screens/CreateAD";
+import { PreviewAD } from "@screens/PreviewAD";
 
 import HomeSvg from "@assets/home.svg"
 import ADSvg from "@assets/AD.svg"
@@ -14,6 +15,7 @@ type AppRoutes = {
   myads: undefined;
   logoff: undefined;
   createad: undefined;
+  previewad: undefined;
 }
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRoutes>
@@ -67,6 +69,8 @@ export function AppRoutes() {
       />
 
       <Screen name="createad" component={CreateAD} options={{ tabBarButton: () => null }} />
+
+      <Screen name='previewad' component={PreviewAD} options={{ tabBarButton: () => null }} />
     </Navigator>
   );
 }

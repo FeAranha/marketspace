@@ -6,7 +6,6 @@ import CheckboxSvg from "@assets/checked.svg";
 
 export interface Props extends TouchableOpacityProps {
   checked?: boolean;
-  variant?: 'new' | 'used'
 }
 
 export function CheckboxCircle({ checked = false, ...rest }: Props) {

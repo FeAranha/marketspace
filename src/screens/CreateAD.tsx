@@ -41,7 +41,9 @@ export function CreateAD() {
     navigation.navigate('myads')
   }
 
-  function goPreviewAD() {}
+  function goPreviewAD() {
+    navigation.navigate('previewad')
+  }
 
   return (
     <ScrollView
