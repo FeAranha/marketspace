@@ -1,9 +1,10 @@
 import {
   CheckIcon,
+  FlatList,
   HStack,
   Heading,
   Icon,
-  Select,
+  Spacer,
   Stack,
   Text,
   VStack,
@@ -11,14 +12,34 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "@components/Input";
+import DropDownPicker from "react-native-dropdown-picker";
+import { ProductCard } from "@components/ProductCard";
 
 export function MyADs() {
-  const [service, setService] = React.useState("");
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [currentValue, setCurrentValue] = React.useState([]);
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const contAD = 9;
+
+  const items = [
+    { label: "Todos", value: "all" },
+    { label: "Ativo", value: "active" },
+    { label: "Inativo", value: "inactive" },
+  ];
+
+  const [produts, setProducts] = useState([
+    "Bicicleta",
+    "Sofa",
+    "Tenis",
+    "Armario",
+    "Luminaria",
+    "Bota",
+    "Camisa",
+  ]);
+
   function goCreateAD() {
     navigation.navigate("createad");
   }
@@ -45,32 +66,49 @@ export function MyADs() {
       </HStack>
 
       <VStack p={6}>
-        <HStack justifyContent="space-between">
-          <Text fontSize="sm">{contAD} anúncios</Text>
-
-          <Select
-            borderWidth={1}
-            borderColor='gray.4'
-            height={34}
-            minWidth={112}
-            borderRadius={8}
-            fontSize="sm"
-            selectedValue={service}
-            accessibilityLabel="Filtro"
-            placeholder="Ativos ou Inativos"
-            _selectedItem={{
-              bg: "gray.7",
-              endIcon: <CheckIcon size="5" />,
-            }}
-            onValueChange={(itemValue: React.SetStateAction<string>) =>
-              setService(itemValue)
-            }
-          >
-            <Select.Item label="Todos" value="all" />
-            <Select.Item label="Ativos" value="active" />
-            <Select.Item label="Inative" value="cross" />
-          </Select>
+        <HStack justifyContent="space-between" mb={4}>
+          <Text fontSize="md" color="gray.3">
+            {contAD} anúncios
+          </Text>
+          <Stack w={111} alignItems="center" >
+            <DropDownPicker
+              items={items}
+              open={isOpen}
+              setOpen={() => setIsOpen(!isOpen)}
+              value={currentValue}
+              setValue={(val) => setCurrentValue(val)}
+              
+              placeholder="Filtro"
+              selectedItemLabelStyle={{
+                color: "#1A181B",
+                fontWeight: "bold",
+                fontSize: 14,
+              }}
+              maxHeight={120}
+              //selectedItemContainerStyle={{  backgroundColor:'#f1f'}}
+              //onOpen={}
+              disableBorderRadius={false}
+              showTickIcon={false}
+              style={{ borderColor: "#D9D8DA", }}
+            />
+          </Stack>
         </HStack>
+
+        <FlatList
+          data={produts}
+          numColumns={2}
+          keyExtractor={(item) => item}
+          renderItem={({ item }) => (
+            <HStack w="50%" ml={1}>
+              <ProductCard />
+            </HStack>
+          )}
+          showsVerticalScrollIndicator={false}
+          _contentContainerStyle={{
+            paddingBottom: 20,
+            padding: 1.5,
+          }}
+        />
       </VStack>
     </Stack>
   );
