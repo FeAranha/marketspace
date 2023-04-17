@@ -26,7 +26,7 @@ export function ProductCard({ ...rest }: Props) {
         />
         <HStack justifyContent="space-between" flex={1} mb={20}>
           <Image source={UserAvatar} size={6} alt="avatar" />
-          <Box mr={-6} h={4} w={10} alignItems="center" rounded="full" bg="blue.7">
+          <Box mr={-7} h={4} w={10} alignItems="center" rounded="full" bg="blue.7">
             <Text fontFamily="heading" fontSize="ss" color="white">
               NOVO
             </Text>
@@ -40,7 +40,7 @@ export function ProductCard({ ...rest }: Props) {
             R$
           </Heading>
           <Heading fontFamily="heading" fontSize="md">
-            2.880,00
+            5.540,00
           </Heading>
         </HStack>
       </TouchableOpacity>

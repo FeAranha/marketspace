@@ -1,6 +1,5 @@
 import { TouchableOpacity, TouchableOpacityProps } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { CheckCircle, Circle } from "phosphor-react-native";
+import { Circle } from "phosphor-react-native";
 import { Icon, Stack } from "native-base";
 import CheckboxSvg from "@assets/checked.svg";
 

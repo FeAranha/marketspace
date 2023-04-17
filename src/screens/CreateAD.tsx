@@ -12,6 +12,7 @@ import {
   InputLeftAddon,
   Switch,
   Checkbox,
+  Center,
 } from "native-base";
 import { Feather } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
@@ -51,6 +52,7 @@ export function CreateAD() {
       showsHorizontalScrollIndicator={false}
     >
       <VStack flex={1} p={6} bg="gray.6">
+        <Center >
         <HStack>
           <Icon
             mt={12}
@@ -62,6 +64,7 @@ export function CreateAD() {
           />
           <ScreenHeader title="Criar anúncio" variant="goback" />
         </HStack>
+        </Center>
         <Heading fontFamily="heading" fontSize="md" color="gray.2">
           Imagens
         </Heading>
@@ -195,7 +198,7 @@ export function CreateAD() {
       >
         <Button w={40}  title="Cancelar" variant="solid" onPress={goMyADs} />
 
-        <Button w={40} title="Acançar" bgColor="gray.1" onPress={goPreviewAD} />
+        <Button w={40} title="Avançar" bgColor="gray.1" onPress={goPreviewAD} />
       </HStack>
     </ScrollView>
   );
