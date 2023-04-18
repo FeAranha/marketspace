@@ -4,6 +4,7 @@ import { MyADs } from "@screens/MyADs";
 import { Logoff } from "@screens/Logoff";
 import { CreateAD } from "@screens/CreateAD";
 import { PreviewAD } from "@screens/PreviewAD";
+import { AdDetails } from "@screens/AdDetails"
 import { MyAdDetails } from "@screens/MyAdDetails"
 
 import HomeSvg from "@assets/home.svg"
@@ -17,6 +18,7 @@ type AppRoutes = {
   logoff: undefined;
   createad: undefined;
   previewad: undefined;
+  addetails: undefined;
   myaddetails: undefined;
 }
 
@@ -73,6 +75,7 @@ export function AppRoutes() {
       <Screen name="createad" component={CreateAD} options={{ tabBarButton: () => null }} />
       <Screen name='previewad' component={PreviewAD} options={{ tabBarButton: () => null }} />
       <Screen name='myaddetails' component={MyAdDetails} options={{ tabBarButton: () => null }} />
+      <Screen name ='addetails' component={AdDetails} options={{ tabBarButton: () => null }} />
       
     </Navigator>
   );

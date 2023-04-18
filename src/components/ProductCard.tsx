@@ -4,17 +4,24 @@ import { Heading, HStack, Image, Text, VStack, Box } from "native-base";
 import BikeImg from "@assets/bicicleta.png";
 
 import AvatarUserImg from "@assets/avatar.png";
+import { useNavigation } from "@react-navigation/native";
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
 
 type Props = TouchableOpacityProps & {
 
 };
 
 export function ProductCard({ ...rest }: Props) {
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
   const UserAvatar = AvatarUserImg;
+
+  function goAdDetails() {
+    navigation.navigate("addetails");
+  }
 
   return (
     <VStack mb={6}>
-      <TouchableOpacity style={{ padding: 4, }} {...rest}>
+      <TouchableOpacity onPress={goAdDetails} style={{ padding: 4, }} {...rest}>
         <Image
           source={BikeImg}
           alt="Bicicleta de corrida preta com aro e guidão vermelho, ao fundo o por do sol de frente para água"
