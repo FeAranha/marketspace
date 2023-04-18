@@ -1,26 +1,36 @@
-import { HomeHeader } from "@components/HomeHeader";
+import React, { useState } from "react";
+import { TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import {
+  Button,
   FlatList,
   HStack,
   Heading,
   Icon,
   Text,
   VStack,
+  Modal,
+  Switch,
+  Checkbox,
+  Box,
 } from "native-base";
-import { ScrollView } from 'react-native-virtualized-view';
-import { Octicons } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native";
-import { Input } from "@components/Input";
-import { FontAwesome } from "@expo/vector-icons";
+import { ScrollView } from "react-native-virtualized-view";
+
+import { FontAwesome, Octicons, AntDesign } from "@expo/vector-icons";
 import { Sliders } from "phosphor-react-native";
+
+import { Input } from "@components/Input";
+import { HomeHeader } from "@components/HomeHeader";
 import { ProductCard } from "@components/ProductCard";
-import { useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 
 export function Home() {
+  const [groupValues, setGroupValues] = useState([]);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [isTraded, setisTraded] = useState(false);
   const navigation = useNavigation<AppNavigatorRoutesProps>();
+  const [isNew, setisNew] = useState(false);
   const [produts, setProducts] = useState([
     "Bicicleta",
     "Sofa",
@@ -31,17 +41,23 @@ export function Home() {
     "Camisa",
   ]);
 
-  function goMyADs(){
-    navigation.navigate('myads')
+  function goMyADs() {
+    navigation.navigate("myads");
+  }
+
+  function handleCheck() {
+    setisNew(!isNew);
   }
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1}} showsHorizontalScrollIndicator={false}>
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1 }}
+      showsHorizontalScrollIndicator={false}
+    >
       <VStack flex={1} px={6} bg="gray.6">
-        <HomeHeader/>
+        <HomeHeader />
 
         <VStack my={8}>
-          
           <Text mb={3}>Seus produtos anunciados para venda </Text>
 
           <TouchableOpacity onPress={goMyADs}>
@@ -78,6 +94,116 @@ export function Home() {
             Compre produtos variados
           </Text>
 
+          <Modal
+            isOpen={modalVisible}
+            onClose={() => setModalVisible(false)}
+            avoidKeyboard
+            justifyContent="flex-end"
+            bottom="4"
+            size="full"
+          >
+            <Modal.Content pt={4}>
+              <Modal.CloseButton color="gray.4" />
+              <Modal.Header borderBottomWidth={0}>
+                <Heading color="gray.1" fontFamily="heading" fontSize="lg">
+                  Filtrar anúncios
+                </Heading>
+              </Modal.Header>
+
+              <Modal.Body alignItems="flex-start">
+                
+                <HStack>
+                  <TouchableOpacity
+                    onPress={handleCheck}
+                    style={{ alignItems: "center" }}
+                    activeOpacity={0.7}
+                  >
+                    {isNew ? (
+                      <Box bg="blue.5">
+                        <Text color="gray.7">Novo</Text>
+                      </Box>
+                    ) : (
+                      <Box bg="gray.5">
+                        <Text color="gray.7">Novo</Text>
+                      </Box>
+                    )}
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={handleCheck}
+                    style={{ alignItems: "center" }}
+                    activeOpacity={0.7}
+                  >
+                    {!isNew ? (
+                      <Box bg="blue.5">
+                        <Text color="gray.7">Usado</Text>
+                      </Box>
+                    ) : (
+                      <Box bg="gray.5">
+                        <Text color="gray.7">Usado</Text>
+                      </Box>
+                    )}
+                  </TouchableOpacity>
+                </HStack>
+
+                <Heading color="gray.1" fontFamily="heading" fontSize="sm">
+                  Aceita troca
+                </Heading>
+                <Switch size="lg" onChange={() => setisTraded(!isTraded)} />
+
+                <Heading
+                  mt={4}
+                  fontFamily="heading"
+                  fontSize="sm"
+                  color="gray.2"
+                >
+                  Meios de pagamento aceitos
+                </Heading>
+
+                <Checkbox.Group
+                  onChange={setGroupValues}
+                  value={groupValues}
+                  accessibilityLabel="choose numbers"
+                >
+                  <Checkbox value="boleto" my={1}>
+                    <Text fontFamily="body" fontSize="md">
+                      Boleto
+                    </Text>
+                  </Checkbox>
+                  <Checkbox value="pix" my={1}>
+                    <Text fontFamily="body" fontSize="md">
+                      Pix
+                    </Text>
+                  </Checkbox>
+                  <Checkbox value="dinheiro" my={1}>
+                    <Text fontFamily="body" fontSize="md">
+                      Dinheiro
+                    </Text>
+                  </Checkbox>
+                  <Checkbox value="cartaoCredito" my={1}>
+                    <Text fontFamily="body" fontSize="md">
+                      Cartão de Crédito
+                    </Text>
+                  </Checkbox>
+                  <Checkbox value="depBancario" my={1}>
+                    <Text fontFamily="body" fontSize="md">
+                      Depósito Bancário
+                    </Text>
+                  </Checkbox>
+                </Checkbox.Group>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  flex="1"
+                  onPress={() => {
+                    setModalVisible(false);
+                  }}
+                >
+                  Proceed
+                </Button>
+              </Modal.Footer>
+            </Modal.Content>
+          </Modal>
+
           <Input
             mt={3}
             mb={6}
@@ -95,27 +221,34 @@ export function Home() {
 
                 <VStack borderRightWidth={0.5} bg="gray.4" mr={3} />
 
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                  }}
+                >
                   <Icon as={<Sliders />} mr="2" />
                 </TouchableOpacity>
               </HStack>
             }
           />
 
-            <FlatList
-              data={produts}
-              numColumns={2}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => <HStack w='50%' ml={1}><ProductCard /></HStack>}
-              showsVerticalScrollIndicator={false}
-              _contentContainerStyle={{
-                paddingBottom: 20,
-                padding: 1.5,
-              }}
-            />
-          </VStack>
+          <FlatList
+            data={produts}
+            numColumns={2}
+            keyExtractor={(item) => item}
+            renderItem={({ item }) => (
+              <HStack w="50%" ml={1}>
+                <ProductCard />
+              </HStack>
+            )}
+            showsVerticalScrollIndicator={false}
+            _contentContainerStyle={{
+              paddingBottom: 20,
+              padding: 1.5,
+            }}
+          />
         </VStack>
-      
+      </VStack>
     </ScrollView>
   );
 }
