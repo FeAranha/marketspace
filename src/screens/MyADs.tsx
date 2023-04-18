@@ -70,8 +70,10 @@ export function MyADs() {
           <Text fontSize="md" color="gray.3">
             {contAD} anúncios
           </Text>
-          <Stack w={111} alignItems="center" >
+
+          <Stack w={111} >
             <DropDownPicker
+              
               items={items}
               open={isOpen}
               setOpen={() => setIsOpen(!isOpen)}
@@ -85,16 +87,15 @@ export function MyADs() {
                 fontSize: 14,
               }}
               maxHeight={120}
-              //selectedItemContainerStyle={{  backgroundColor:'#f1f'}}
-              //onOpen={}
               disableBorderRadius={false}
               showTickIcon={false}
-              style={{ borderColor: "#D9D8DA", }}
+              style={{ borderColor: "#D9D8DA" }}
             />
           </Stack>
         </HStack>
 
         <FlatList
+          style={{ zIndex: -5}}
           data={produts}
           numColumns={2}
           keyExtractor={(item) => item}

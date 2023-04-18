@@ -13,7 +13,7 @@ export function ProductCard({ ...rest }: Props) {
   const UserAvatar = AvatarUserImg;
 
   return (
-    <VStack bg="gray.6" mb={6}>
+    <VStack mb={6}>
       <TouchableOpacity style={{ padding: 4, }} {...rest}>
         <Image
           source={BikeImg}
