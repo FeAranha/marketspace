@@ -12,12 +12,11 @@ import {
   Modal,
   Switch,
   Checkbox,
-  Box,
 } from "native-base";
 import { ScrollView } from "react-native-virtualized-view";
 
 import { FontAwesome, Octicons, AntDesign } from "@expo/vector-icons";
-import { Sliders } from "phosphor-react-native";
+import { Sliders, XCircle } from "phosphor-react-native";
 
 import { Input } from "@components/Input";
 import { HomeHeader } from "@components/HomeHeader";
@@ -30,7 +29,7 @@ export function Home() {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [isTraded, setisTraded] = useState(false);
   const navigation = useNavigation<AppNavigatorRoutesProps>();
-  const [isNew, setisNew] = useState(false);
+  const [isNew, setisNew] = useState(true);
   const [produts, setProducts] = useState([
     "Bicicleta",
     "Sofa",
@@ -47,6 +46,7 @@ export function Home() {
 
   function handleCheck() {
     setisNew(!isNew);
+    console.log("is new? ", isNew);
   }
 
   return (
@@ -103,62 +103,95 @@ export function Home() {
             size="full"
           >
             <Modal.Content pt={4}>
-              <Modal.CloseButton color="gray.4" />
-              <Modal.Header borderBottomWidth={0}>
-                <Heading color="gray.1" fontFamily="heading" fontSize="lg">
-                  Filtrar anúncios
-                </Heading>
-              </Modal.Header>
+              <HStack alignItems="center">
+                <Modal.CloseButton color="gray.4" />
+                <Modal.Header borderBottomWidth={0}>
+                  <Heading color="gray.1" fontFamily="heading" fontSize="lg">
+                    Filtrar anúncios
+                  </Heading>
+                </Modal.Header>
+              </HStack>
 
               <Modal.Body alignItems="flex-start">
-                
                 <HStack>
-                  <TouchableOpacity
-                    onPress={handleCheck}
-                    style={{ alignItems: "center" }}
-                    activeOpacity={0.7}
-                  >
-                    {isNew ? (
-                      <Box bg="blue.5">
-                        <Text color="gray.7">Novo</Text>
-                      </Box>
-                    ) : (
-                      <Box bg="gray.5">
-                        <Text color="gray.7">Novo</Text>
-                      </Box>
-                    )}
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={handleCheck}
-                    style={{ alignItems: "center" }}
-                    activeOpacity={0.7}
-                  >
-                    {!isNew ? (
-                      <Box bg="blue.5">
-                        <Text color="gray.7">Usado</Text>
-                      </Box>
-                    ) : (
-                      <Box bg="gray.5">
-                        <Text color="gray.7">Usado</Text>
-                      </Box>
-                    )}
-                  </TouchableOpacity>
+                  {isNew ? (
+                    <Button
+                      endIcon={<Icon as={<XCircle size={16} color="#EDECEE" weight="fill"/>} onPress={handleCheck}/>}
+                      h={7}
+                      mr={2}
+                      onPress={handleCheck}
+                      bg="blue.5"
+                      rounded="3xl"
+                      _pressed={{
+                        bg: "blue.5"
+                      }}
+                    >
+                      <Text my={-2} color="gray.7">
+                        Novo
+                      </Text>
+                    </Button>
+                  ) : (
+                    <Button
+                      h={7}
+                      mr={2}
+                      onPress={handleCheck}
+                      rounded="3xl"
+                      bg="gray.5"
+                      _pressed={{
+                        bg: "gray.5"
+                      }}
+                    >
+                      <Text my={-2} color="gray.7">
+                        Novo
+                      </Text>
+                    </Button>
+                  )}
+                  {!isNew ? (
+                    <Button
+                      h={7}
+                      mr={2}
+                      onPress={handleCheck}
+                      bg="blue.5"
+                      rounded="3xl"
+                      _pressed={{
+                        bg: "blue.5"
+                      }}
+                    >
+                      <Text my={-2} color="gray.7">
+                        Usado
+                      </Text>
+                    </Button>
+                  ) : (
+                    <Button
+                      
+                      h={7}
+                      mr={2}
+                      onPress={handleCheck}
+                      bg="gray.5"
+                      rounded="3xl"
+                      _pressed={{
+                        bg: "gray.5"
+                      }}
+                    >
+                      <Text my={-2} color="gray.7">
+                        Usado
+                      </Text>
+                    </Button>
+                  )}
                 </HStack>
 
-                <Heading color="gray.1" fontFamily="heading" fontSize="sm">
+                <Heading mt={4} color="gray.1" fontFamily="heading" fontSize="sm">
                   Aceita troca
                 </Heading>
-                <Switch size="lg" onChange={() => setisTraded(!isTraded)} />
-
+                <Switch mt={-2} size="lg" onChange={() => setisTraded(!isTraded)} />
                 <Heading
-                  mt={4}
+                  mt={2}
                   fontFamily="heading"
                   fontSize="sm"
                   color="gray.2"
                 >
                   Meios de pagamento aceitos
                 </Heading>
-
                 <Checkbox.Group
                   onChange={setGroupValues}
                   value={groupValues}
@@ -191,14 +224,24 @@ export function Home() {
                   </Checkbox>
                 </Checkbox.Group>
               </Modal.Body>
+
               <Modal.Footer>
                 <Button
                   flex="1"
                   onPress={() => {
                     setModalVisible(false);
+                    console.log(
+                      "filtro => ",
+                      "Novo:",
+                      isNew,
+                      ", Trocavél:",
+                      isTraded,
+                      ", Meios de pagamentos: ",
+                      groupValues
+                    );
                   }}
                 >
-                  Proceed
+                  Aplicar filtro
                 </Button>
               </Modal.Footer>
             </Modal.Content>
