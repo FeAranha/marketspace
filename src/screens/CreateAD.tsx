@@ -21,6 +21,8 @@ import { useState } from "react";
 import { ScrollView } from "react-native-virtualized-view";
 import { CheckboxCircle } from "@components/CheckboxCircle";
 import { Button } from "@components/Button";
+import * as ImagePicker from "expo-image-picker";
+import { ProductImg } from "@components/ProductImg";
 
 export function CreateAD() {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
@@ -28,9 +30,27 @@ export function CreateAD() {
   const [isNew, setisNew] = useState(false);
   const [isTraded, setisTraded] = useState(false);
   const [groupValues, setGroupValues] = useState([]);
+  const [productImg, setProductImg] = useState("");
+  const [isNewImgProduct, setIsNewImgProduct] = useState(false);
 
   function handleGoBack() {
     navigation.goBack();
+  }
+
+  async function handleProductImgSelect() {
+    setIsNewImgProduct(!isNewImgProduct);
+
+    const imgSelected = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+      aspect: [4, 4],
+      allowsEditing: true,
+    });
+
+    if (imgSelected.canceled) {
+      return;
+    }
+    setProductImg(imgSelected.assets[0].uri);
   }
 
   function handleCheck() {
@@ -38,12 +58,12 @@ export function CreateAD() {
     setisNew(!isNew);
   }
 
-  function goMyADs(){
-    navigation.navigate('myads')
+  function goMyADs() {
+    navigation.navigate("myads");
   }
 
   function goPreviewAD() {
-    navigation.navigate('previewad')
+    navigation.navigate("previewad");
   }
 
   return (
@@ -52,37 +72,87 @@ export function CreateAD() {
       showsHorizontalScrollIndicator={false}
     >
       <VStack flex={1} p={6} bg="gray.6">
-        <Center >
-        <HStack>
-          <Icon
-            mt={12}
-            as={Feather}
-            name="arrow-left"
-            color="gray.1"
-            size={6}
-            onPress={handleGoBack}
-          />
-          <ScreenHeader title="Criar anúncio" variant="goback" />
-        </HStack>
+        <Center>
+          <HStack>
+            <Icon
+              mt={12}
+              as={Feather}
+              name="arrow-left"
+              color="gray.1"
+              size={6}
+              onPress={handleGoBack}
+            />
+            <ScreenHeader title="Criar anúncio" variant="goback" />
+          </HStack>
         </Center>
+
         <Heading fontFamily="heading" fontSize="md" color="gray.2">
           Imagens
         </Heading>
         <Text mb={4} fontFamily="body" fontSize="sm" color="gray.3">
-          Escolha até 3 imagens para mostrar o quando o seu produto é incrível!
+          Escolha até 3 imagens para mostrar o quanto seu produto é incrível!
         </Text>
-        <Pressable
-          mb={8}
-          justifyContent="space-between"
-          alignContent="center"
-          alignItems="center"
-          w={100}
-          h={100}
-          bg="gray.5"
-          rounded={6}
-        >
-          <Icon as={<AntDesign name="plus" />} size={8} color="gray.4" mt={8} />
-        </Pressable>
+
+        <HStack>
+          {isNewImgProduct ?
+            <>
+              <ProductImg
+                size={100}
+                source={{ uri: productImg }}
+                alt="Imagem do produto"
+              />
+              <Pressable
+                ml={2}
+                background={productImg}
+                mb={8}
+                justifyContent="space-between"
+                alignContent="center"
+                alignItems="center"
+                w={100}
+                h={100}
+                bg="gray.5"
+                rounded={6}
+                onPress={handleProductImgSelect}
+              >
+                <Icon
+                  as={<AntDesign name="plus" />}
+                  size={8}
+                  color="gray.4"
+                  mt={8}
+                />
+              </Pressable>
+            </>
+           : 
+            <>
+              <ProductImg
+                size={100}
+                source={{ uri: productImg }}
+                alt="Imagem do produto"
+              />
+              <Pressable
+                ml={2}
+                background={productImg}
+                mb={8}
+                justifyContent="space-between"
+                alignContent="center"
+                alignItems="center"
+                w={100}
+                h={100}
+                bg="gray.5"
+                rounded={6}
+                onPress={handleProductImgSelect}
+              >
+                <Icon
+                  as={<AntDesign name="plus" />}
+                  size={8}
+                  color="gray.4"
+                  mt={8}
+                />
+              </Pressable>
+            </>
+          }
+        </HStack>
+
         <Heading fontFamily="heading" fontSize="md" color="gray.2">
           Sobre o produto
         </Heading>
@@ -196,7 +266,7 @@ export function CreateAD() {
         p={6}
         justifyContent="space-between"
       >
-        <Button w={40}  title="Cancelar" variant="solid" onPress={goMyADs} />
+        <Button w={40} title="Cancelar" variant="solid" onPress={goMyADs} />
 
         <Button w={40} title="Avançar" bgColor="gray.1" onPress={goPreviewAD} />
       </HStack>

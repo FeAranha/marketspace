@@ -45,7 +45,7 @@ export function MyADs() {
   }
 
   return (
-    <Stack flex={1} bg="gray.7">
+    <Stack my={8} flex={1} bg="gray.7">
       <HStack
         w="full"
         pb={2}
