@@ -26,7 +26,7 @@ export const AdDetails = (): ReactElement => {
   }
 
   function goWhats() {
-    console.log('click in Buttom 📞 Entrar em contato')
+    
   }
 
   return (

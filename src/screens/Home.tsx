@@ -46,7 +46,6 @@ export function Home() {
 
   function handleCheck() {
     setisNew(!isNew);
-    console.log("is new? ", isNew);
   }
 
   return (
@@ -116,14 +115,21 @@ export function Home() {
                 <HStack>
                   {isNew ? (
                     <Button
-                      endIcon={<Icon as={<XCircle size={16} color="#EDECEE" weight="fill"/>} onPress={handleCheck}/>}
+                      endIcon={
+                        <Icon
+                          as={
+                            <XCircle size={16} color="#EDECEE" weight="fill" />
+                          }
+                          onPress={handleCheck}
+                        />
+                      }
                       h={7}
                       mr={2}
                       onPress={handleCheck}
                       bg="blue.5"
                       rounded="3xl"
                       _pressed={{
-                        bg: "blue.5"
+                        bg: "blue.5",
                       }}
                     >
                       <Text my={-2} color="gray.7">
@@ -138,7 +144,7 @@ export function Home() {
                       rounded="3xl"
                       bg="gray.5"
                       _pressed={{
-                        bg: "gray.5"
+                        bg: "gray.5",
                       }}
                     >
                       <Text my={-2} color="gray.7">
@@ -154,7 +160,7 @@ export function Home() {
                       bg="blue.5"
                       rounded="3xl"
                       _pressed={{
-                        bg: "blue.5"
+                        bg: "blue.5",
                       }}
                     >
                       <Text my={-2} color="gray.7">
@@ -163,14 +169,13 @@ export function Home() {
                     </Button>
                   ) : (
                     <Button
-                      
                       h={7}
                       mr={2}
                       onPress={handleCheck}
                       bg="gray.5"
                       rounded="3xl"
                       _pressed={{
-                        bg: "gray.5"
+                        bg: "gray.5",
                       }}
                     >
                       <Text my={-2} color="gray.7">
@@ -180,10 +185,19 @@ export function Home() {
                   )}
                 </HStack>
 
-                <Heading mt={4} color="gray.1" fontFamily="heading" fontSize="sm">
+                <Heading
+                  mt={4}
+                  color="gray.1"
+                  fontFamily="heading"
+                  fontSize="sm"
+                >
                   Aceita troca
                 </Heading>
-                <Switch mt={-2} size="lg" onChange={() => setisTraded(!isTraded)} />
+                <Switch
+                  mt={-2}
+                  size="lg"
+                  onChange={() => setisTraded(!isTraded)}
+                />
                 <Heading
                   mt={2}
                   fontFamily="heading"
@@ -230,15 +244,6 @@ export function Home() {
                   flex="1"
                   onPress={() => {
                     setModalVisible(false);
-                    console.log(
-                      "filtro => ",
-                      "Novo:",
-                      isNew,
-                      ", Trocavél:",
-                      isTraded,
-                      ", Meios de pagamentos: ",
-                      groupValues
-                    );
                   }}
                 >
                   Aplicar filtro
