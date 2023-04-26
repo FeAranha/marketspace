@@ -18,6 +18,8 @@ import EditButtonSVG from "@assets/buttonEdit.svg";
 import userPhotoDefault from "@assets/userPhotoDefault.png";
 import { useNavigation } from "@react-navigation/native";
 import { useForm, Controller } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 type FormDataProps = {
   name: string;
@@ -25,10 +27,26 @@ type FormDataProps = {
   phone: string;
   password: string;
   password_confirm: string;
-}
+};
+
+const signUpSchema = yup.object({
+  name: yup.string().required("Informe o nome."),
+  email: yup.string().required("Informe o e-mail").email("E-mail inválido."),
+  password: yup
+    .string()
+    .required("Informe a senha")
+    .min(8, "A senha deve ter pelo menos 8 dígitos."),
+  password_confirm: yup
+    .string()
+    .required("Confirme a senha.")
+    .oneOf([yup.ref("password")], "A confirmação da senha não confere"),
+});
 
 export function SignUp() {
-  const { control, handleSubmit } = useForm<FormDataProps>();
+  const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
+    resolver: yupResolver(signUpSchema),
+  });
+
   const [show, setShow] = useState(false);
   const navigation = useNavigation();
 
@@ -36,8 +54,14 @@ export function SignUp() {
     navigation.goBack();
   }
 
-  function handleSignUp({name, email, phone, password, password_confirm }: FormDataProps) {
-    console.log({ name, email, phone, password, password_confirm })
+  function handleSignUp({
+    name,
+    email,
+    phone,
+    password,
+    password_confirm,
+  }: FormDataProps) {
+    console.log({ name, email, phone, password, password_confirm });
   }
 
   return (
@@ -85,6 +109,7 @@ export function SignUp() {
                   placeholder="Nome"
                   onChangeText={onChange}
                   value={value}
+                  errorMessage={errors.name?.message}
                 />
               )}
             />
@@ -98,6 +123,7 @@ export function SignUp() {
                   autoCapitalize="none"
                   onChangeText={onChange}
                   value={value}
+                  errorMessage={errors.email?.message}
                 />
               )}
             />
@@ -110,6 +136,7 @@ export function SignUp() {
                   placeholder="Telefone"
                   onChangeText={onChange}
                   value={value}
+                  errorMessage={errors.phone?.message}
                 />
               )}
             />
@@ -135,9 +162,10 @@ export function SignUp() {
                     </TouchableOpacity>
                   }
                   placeholder="Senha"
-                  secureTextEntry
+                  //secureTextEntry
                   onChangeText={onChange}
                   value={value}
+                  errorMessage={errors.password?.message}
                 />
               )}
             />
@@ -163,16 +191,22 @@ export function SignUp() {
                     </TouchableOpacity>
                   }
                   placeholder="Confirmar senha"
-                  secureTextEntry
+                  //secureTextEntry
                   onChangeText={onChange}
                   value={value}
                   onSubmitEditing={handleSubmit(handleSignUp)}
                   returnKeyType="send"
+                  errorMessage={errors.password_confirm?.message}
                 />
               )}
             />
 
-            <Button title="Criar" bgColor="gray.1" mt={6} mb={12} onPress={handleSubmit(handleSignUp)}/>
+            <Button
+              title="Criar"
+              bgColor="gray.1"
+              mt={6}
+              mb={12}
+              onPress={handleSubmit(handleSignUp)}/>
 
             <Text fontFamily="body" fontSize="sm" color="gray.2">
               Já tem uma conta?
