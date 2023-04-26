@@ -1,4 +1,4 @@
-import { ScreenHeader } from "@components/ScreenHeader";
+import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import {
@@ -13,16 +13,21 @@ import {
   Switch,
   Checkbox,
   Center,
+  useToast,
 } from "native-base";
+
 import { Feather } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
+
 import { Input } from "@components/Input";
-import { useState } from "react";
-import { ScrollView } from "react-native-virtualized-view";
-import { CheckboxCircle } from "@components/CheckboxCircle";
 import { Button } from "@components/Button";
-import * as ImagePicker from "expo-image-picker";
 import { ProductImg } from "@components/ProductImg";
+import { ScrollView } from "react-native-virtualized-view";
+import { ScreenHeader } from "@components/ScreenHeader";
+import { CheckboxCircle } from "@components/CheckboxCircle";
+
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
 
 export function CreateAD() {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
@@ -30,27 +35,47 @@ export function CreateAD() {
   const [isNew, setisNew] = useState(false);
   const [isTraded, setisTraded] = useState(false);
   const [groupValues, setGroupValues] = useState([]);
-  const [productImg, setProductImg] = useState("");
+  const [productImg, setProductImg] = useState("notnull🙄");
   const [isNewImgProduct, setIsNewImgProduct] = useState(false);
+  const toast = useToast();
 
   function handleGoBack() {
     navigation.goBack();
   }
 
   async function handleProductImgSelect() {
-    setIsNewImgProduct(!isNewImgProduct);
+    setIsNewImgProduct(true);
 
-    const imgSelected = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-      aspect: [4, 4],
-      allowsEditing: true,
-    });
+    try {
+      const imgSelected = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 1,
+        aspect: [4, 4],
+        allowsEditing: true,
+      });
 
-    if (imgSelected.canceled) {
-      return;
+      if (imgSelected.canceled) {
+        return;
+      }
+
+      if (imgSelected.assets[0].uri) {
+        const imgInfo = await FileSystem.getInfoAsync(
+          imgSelected.assets[0].uri
+        );
+        if (imgInfo.size && imgInfo.size / 1024 / 1024 > 5) {
+          return toast.show({
+            title: "Essa imagem utrapassou o limite de 5MB",
+            placement: "top",
+            bgColor: "red.500",
+          });
+        }
+        setProductImg(imgSelected.assets[0].uri);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsNewImgProduct(false);
     }
-    setProductImg(imgSelected.assets[0].uri);
   }
 
   function handleCheck() {
@@ -94,7 +119,7 @@ export function CreateAD() {
         </Text>
 
         <HStack>
-          {isNewImgProduct ?
+          {isNewImgProduct ? (
             <>
               <ProductImg
                 size={100}
@@ -122,7 +147,7 @@ export function CreateAD() {
                 />
               </Pressable>
             </>
-           : 
+          ) : (
             <>
               <ProductImg
                 size={100}
@@ -150,7 +175,7 @@ export function CreateAD() {
                 />
               </Pressable>
             </>
-          }
+          )}
         </HStack>
 
         <Heading fontFamily="heading" fontSize="md" color="gray.2">
