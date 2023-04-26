@@ -17,13 +17,27 @@ import { Button } from "@components/Button";
 import EditButtonSVG from "@assets/buttonEdit.svg";
 import userPhotoDefault from "@assets/userPhotoDefault.png";
 import { useNavigation } from "@react-navigation/native";
+import { useForm, Controller } from "react-hook-form";
+
+type FormDataProps = {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  password_confirm: string;
+}
 
 export function SignUp() {
+  const { control, handleSubmit } = useForm<FormDataProps>();
   const [show, setShow] = useState(false);
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
-  function handleGoBack(){
-    navigation.goBack()
+  function handleGoBack() {
+    navigation.goBack();
+  }
+
+  function handleSignUp({name, email, phone, password, password_confirm }: FormDataProps) {
+    console.log({ name, email, phone, password, password_confirm })
   }
 
   return (
@@ -63,59 +77,112 @@ export function SignUp() {
               </TouchableOpacity>
             </HStack>
 
-            <Input placeholder="Nome" />
-
-            <Input
-              placeholder="E-mail"
-              keyboardType="email-address"
-              autoCapitalize="none"
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  placeholder="Nome"
+                  onChangeText={onChange}
+                  value={value}
+                />
+              )}
             />
-            <Input placeholder="Telefone" />
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  placeholder="E-mail"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  onChangeText={onChange}
+                  value={value}
+                />
+              )}
+            />
 
-            <Input
-              type={show ? "text" : "password"}
-              InputRightElement={
-                <TouchableOpacity onPress={() => setShow(!show)}>
-                  <Icon
-                    as={
-                      <MaterialIcons
-                        name={show ? "visibility" : "visibility-off"}
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  placeholder="Telefone"
+                  onChangeText={onChange}
+                  value={value}
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  type={show ? "text" : "password"}
+                  InputRightElement={
+                    <TouchableOpacity onPress={() => setShow(!show)}>
+                      <Icon
+                        as={
+                          <MaterialIcons
+                            name={show ? "visibility" : "visibility-off"}
+                          />
+                        }
+                        size={5}
+                        mr="4"
+                        color="muted.400"
                       />
-                    }
-                    size={5}
-                    mr="4"
-                    color="muted.400"
-                  />
-                </TouchableOpacity>
-              }
-              placeholder="Senha"
+                    </TouchableOpacity>
+                  }
+                  placeholder="Senha"
+                  secureTextEntry
+                  onChangeText={onChange}
+                  value={value}
+                />
+              )}
             />
 
-            <Input
-              type={show ? "text" : "password"}
-              InputRightElement={
-                <TouchableOpacity onPress={() => setShow(!show)}>
-                  <Icon
-                    as={
-                      <MaterialIcons
-                        name={show ? "visibility" : "visibility-off"}
+            <Controller
+              control={control}
+              name="password_confirm"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  type={show ? "text" : "password"}
+                  InputRightElement={
+                    <TouchableOpacity onPress={() => setShow(!show)}>
+                      <Icon
+                        as={
+                          <MaterialIcons
+                            name={show ? "visibility" : "visibility-off"}
+                          />
+                        }
+                        size={5}
+                        mr="4"
+                        color="muted.400"
                       />
-                    }
-                    size={5}
-                    mr="4"
-                    color="muted.400"
-                  />
-                </TouchableOpacity>
-              }
-              placeholder="Confirmar senha"
+                    </TouchableOpacity>
+                  }
+                  placeholder="Confirmar senha"
+                  secureTextEntry
+                  onChangeText={onChange}
+                  value={value}
+                  onSubmitEditing={handleSubmit(handleSignUp)}
+                  returnKeyType="send"
+                />
+              )}
             />
 
-            <Button title="Criar" bgColor='gray.1' mt={6} mb={12} />
+            <Button title="Criar" bgColor="gray.1" mt={6} mb={12} onPress={handleSubmit(handleSignUp)}/>
 
             <Text fontFamily="body" fontSize="sm" color="gray.2">
               Já tem uma conta?
             </Text>
-            <Button my={4} title="Ir para o login" variant="solid" onPress={handleGoBack}/>
+            <Button
+              my={4}
+              title="Ir para o login"
+              variant="solid"
+              onPress={handleGoBack}
+            />
           </Center>
         </VStack>
       </VStack>
