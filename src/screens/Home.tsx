@@ -21,15 +21,10 @@ import { Sliders, XCircle } from "phosphor-react-native";
 import { Input } from "@components/Input";
 import { HomeHeader } from "@components/HomeHeader";
 import { ProductCard } from "@components/ProductCard";
-import { useForm, Controller } from "react-hook-form";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 
-type FormDataProps = {
-  searchAD: string;
-};
-
-export function Home({ searchAD }: FormDataProps) {
-  const { control, handleSubmit } = useForm<FormDataProps>();
+export function Home() {
+  const [searchAd, setSearchAd] = useState("");
   const [groupValues, setGroupValues] = useState([]);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [isTraded, setisTraded] = useState(false);
@@ -54,7 +49,7 @@ export function Home({ searchAD }: FormDataProps) {
   }
 
   function handleSearch() {
-    console.log('searchAD:', searchAD );
+    console.log("searchAD:", searchAd);
   }
 
   return (
@@ -252,7 +247,6 @@ export function Home({ searchAD }: FormDataProps) {
                 <Button
                   flex="1"
                   onPress={() => {
-
                     setModalVisible(false);
                     console.log(
                       "filtro => ",
@@ -262,8 +256,8 @@ export function Home({ searchAD }: FormDataProps) {
                       isTraded,
                       ", Meios de pagamentos: ",
                       groupValues,
-                      'Buscar anúncio por: ',
-                      searchAD
+                      "Buscar anúncio por: ",
+                      searchAd
                     );
                   }}
                 >
@@ -273,44 +267,34 @@ export function Home({ searchAD }: FormDataProps) {
             </Modal.Content>
           </Modal>
 
-          <Controller
-            control={control}
-            name="searchAD"
-            render={({ field: { onChange, value } }) => (
-              <Input
-                mt={3}
-                mb={6}
-                placeholder="Buscar anúncio"
-                InputRightElement={
-                  <HStack>
-                    <TouchableOpacity 
-                      onPress={handleSubmit(handleSearch)}
-                      >
-                      <Icon
-                        as={<FontAwesome name="search" />}
-                        size={5}
-                        mr="2"
-                        color="gray.2"
-                      />
-                    </TouchableOpacity>
+          <Input
+            onChangeText={setSearchAd}
+            value="searchad"
+            mt={3}
+            mb={6}
+            placeholder="Buscar anúncio"
+            InputRightElement={
+              <HStack>
+                <TouchableOpacity onPress={handleSearch}>
+                  <Icon
+                    as={<FontAwesome name="search" />}
+                    size={5}
+                    mr="2"
+                    color="gray.2"
+                  />
+                </TouchableOpacity>
 
-                    <VStack borderRightWidth={0.5} bg="gray.4" mr={3} />
+                <VStack borderRightWidth={0.5} bg="gray.4" mr={3} />
 
-                    <TouchableOpacity
-                      onPress={() => {
-                        setModalVisible(!modalVisible);
-                      }}
-                    >
-                      <Icon as={<Sliders />} mr="2" />
-                    </TouchableOpacity>
-                  </HStack>
-                }
-                onChangeText={onChange}
-                value={value}
-                onSubmitEditing={handleSubmit(handleSearch)}
-                returnKeyType="send"
-              />
-            )}
+                <TouchableOpacity
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                  }}
+                >
+                  <Icon as={<Sliders />} mr="2" />
+                </TouchableOpacity>
+              </HStack>
+            }
           />
 
           <FlatList
