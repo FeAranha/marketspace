@@ -1,10 +1,8 @@
 import {
-  CheckIcon,
   FlatList,
   HStack,
   Heading,
   Icon,
-  Spacer,
   Stack,
   Text,
   VStack,
@@ -13,7 +11,6 @@ import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import React, { useState } from "react";
-import { Input } from "@components/Input";
 import DropDownPicker from "react-native-dropdown-picker";
 import { ProductCard } from "@components/ProductCard";
 
@@ -72,7 +69,7 @@ export function MyADs() {
           </Text>
 
           <Stack w={111} >
-            <DropDownPicker
+            <DropDownPicker //⚠ DropDownPicker filtro ativo/inativo
               items={items}
               open={isOpen}
               setOpen={() => setIsOpen(!isOpen)}

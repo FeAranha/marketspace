@@ -72,7 +72,7 @@ export function Home() {
               justifyContent="space-between"
             >
               <Icon as={<Octicons name="tag" />} size={6} color="blue.7" />
-
+{/* API count AD ativos */}
               <VStack>
                 <Heading fontFamily="heading" fontSize="lg" color="gray.2">
                   4
@@ -261,6 +261,7 @@ export function Home() {
                     );
                   }}
                 >
+                  {/* TODO filtro: terminar Bottom */}
                   Aplicar filtro
                 </Button>
               </Modal.Footer>

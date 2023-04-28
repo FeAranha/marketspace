@@ -23,7 +23,7 @@ export const AdDetails = (): ReactElement => {
   }
 
   function goWhats() {
-    
+    //TODO function goWhats
   }
 
   return (
@@ -62,7 +62,7 @@ export const AdDetails = (): ReactElement => {
               <Heading mr={1} fontFamily="heading" fontSize="sm" color="blue.7">
                 R$
               </Heading>
-              <Heading fontFamily="heading" fontSize="xl" color="blue.7">
+              <Heading fontFamily="heading" fontSize="xl" color="blue.7">//API product price
                 5.540,00
               </Heading>
               </HStack>

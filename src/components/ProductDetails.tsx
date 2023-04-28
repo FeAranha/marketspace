@@ -31,10 +31,10 @@ export function ProductDetails(){
               NOVO
             </Text>
           </Box>
-
+{/* API dados produto */}
           <HStack mt={2} alignItems="center" justifyContent="space-between">
             <Heading fontFamily="heading" fontSize="lg" color="gray.1">
-              Bicicleta de corrida
+              Bicicleta de corrida 
             </Heading>
             <HStack alignItems="center">
               <Heading mr={1} fontFamily="heading" fontSize="sm" color="blue.5">
@@ -59,7 +59,7 @@ export function ProductDetails(){
               Sim
             </Text>
           </HStack>
-
+{/* API meios de pagamento */}
           <Heading my={4} fontSize="sm" fontFamily="heading" color="gray.2">
             Meios de pagamento:
           </Heading>

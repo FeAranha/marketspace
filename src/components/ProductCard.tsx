@@ -13,7 +13,7 @@ type Props = TouchableOpacityProps & {
 
 export function ProductCard({ ...rest }: Props) {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
-  const UserAvatar = AvatarUserImg;
+  const UserAvatar = AvatarUserImg;//API user avatar
 
   function goAdDetails() {
     navigation.navigate("addetails");
@@ -31,6 +31,7 @@ export function ProductCard({ ...rest }: Props) {
           resizeMode="contain"
           position="absolute"
         />
+{/*  API product */}
         <HStack justifyContent="space-between" flex={1} mb={20}>
           <Image source={UserAvatar} size={6} alt="avatar" />
           <Box mr={-7} h={4} w={10} alignItems="center" rounded="full" bg="blue.7">

@@ -1,5 +1,5 @@
 import { Center, Text } from "native-base";
-
+//TODO logoff
 export function Logoff() {
   return (
     <Center flex={1}>

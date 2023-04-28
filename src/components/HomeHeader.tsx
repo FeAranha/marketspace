@@ -21,6 +21,7 @@ export function HomeHeader({...rest}: Props) {
           Boas vindas,
         </Text>
         <Heading fontFamily="heading" fontSize="md" color="gray.1">
+          {/* //API bem vindo user */}
           Maria!
         </Heading>
       </VStack>

@@ -61,7 +61,7 @@ export function CreateAD() {
       if (imgSelected.assets[0].uri) {
         const imgInfo = await FileSystem.getInfoAsync(
           imgSelected.assets[0].uri
-        );
+        );//⚠ size não afeta
         if (imgInfo.size && imgInfo.size / 1024 / 1024 > 5) {
           return toast.show({
             title: "Essa imagem utrapassou o limite de 5MB",
@@ -117,7 +117,7 @@ export function CreateAD() {
         <Text mb={4} fontFamily="body" fontSize="sm" color="gray.3">
           Escolha até 3 imagens para mostrar o quanto seu produto é incrível!
         </Text>
-
+        {/* TODO carrossel de imagens */}
         <HStack>
           {isNewImgProduct ? (
             <>
