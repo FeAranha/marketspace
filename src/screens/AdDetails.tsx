@@ -62,7 +62,8 @@ export const AdDetails = (): ReactElement => {
               <Heading mr={1} fontFamily="heading" fontSize="sm" color="blue.7">
                 R$
               </Heading>
-              <Heading fontFamily="heading" fontSize="xl" color="blue.7">//API product price
+              {/* API product price */}
+              <Heading fontFamily="heading" fontSize="xl" color="blue.7">
                 5.540,00
               </Heading>
               </HStack>
@@ -75,6 +76,7 @@ export const AdDetails = (): ReactElement => {
             title="Entrar em contato"
             onPress={goWhats}
           />
+          {/* TODO 📞 goWhats */}
           </HStack>
       </Stack>
     </ScrollView>

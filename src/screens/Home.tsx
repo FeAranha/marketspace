@@ -202,6 +202,7 @@ export function Home() {
                   size="lg"
                   onChange={() => setisTraded(!isTraded)}
                 />
+                {/* ⚛ Meios Pag */}
                 <Heading
                   mt={2}
                   fontFamily="heading"

@@ -86,6 +86,7 @@ export function MyADs() {
               disableBorderRadius={false}
               showTickIcon={false}
               style={{ borderColor: "#D9D8DA" }}
+              onPress={() => console.log('filtrar: ', currentValue)}
             />
           </Stack>
         </HStack>

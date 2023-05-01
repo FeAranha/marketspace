@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import {
@@ -18,6 +19,8 @@ import {
 
 import { Feather } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
+import * as FileSystem from "expo-file-system";
+import * as ImagePicker from "expo-image-picker";
 
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
@@ -26,8 +29,14 @@ import { ScrollView } from "react-native-virtualized-view";
 import { ScreenHeader } from "@components/ScreenHeader";
 import { CheckboxCircle } from "@components/CheckboxCircle";
 
-import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
+type FormDataProps = {
+  titleAd: string;
+  descAd: string;
+  newProduct: boolean;
+  priceProduct: number;
+  traded: boolean;
+  meiosPag: string;
+};
 
 export function CreateAD() {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
@@ -38,6 +47,8 @@ export function CreateAD() {
   const [productImg, setProductImg] = useState("notnull🙄");
   const [isNewImgProduct, setIsNewImgProduct] = useState(false);
   const toast = useToast();
+
+  const { control, handleSubmit } = useForm<FormDataProps>();
 
   function handleGoBack() {
     navigation.goBack();
@@ -61,7 +72,7 @@ export function CreateAD() {
       if (imgSelected.assets[0].uri) {
         const imgInfo = await FileSystem.getInfoAsync(
           imgSelected.assets[0].uri
-        );//⚠ size não afeta
+        ); //⚠ size não afeta
         if (imgInfo.size && imgInfo.size / 1024 / 1024 > 5) {
           return toast.show({
             title: "Essa imagem utrapassou o limite de 5MB",
@@ -88,6 +99,15 @@ export function CreateAD() {
   }
 
   function goPreviewAD() {
+    console.log(
+      "Nome: ",
+      "| Desc: ",
+      "| é novo:", isSelected,
+      "| Price: ",
+      "| é trocavel?", isTraded,
+      "| Meios Pag: ", groupValues
+    );
+
     navigation.navigate("previewad");
   }
 
@@ -181,7 +201,9 @@ export function CreateAD() {
         <Heading fontFamily="heading" fontSize="md" color="gray.2">
           Sobre o produto
         </Heading>
+
         <Input mt={4} placeholder="Título do anúncio" fontSize="md" />
+
         <TextArea
           h={160}
           placeholder="Descrição do produto"
@@ -246,6 +268,8 @@ export function CreateAD() {
           </Heading>
           <Switch size="lg" onChange={() => setisTraded(!isTraded)} />
         </VStack>
+        {/* ⚛ Meios Pag */}
+        {/* ⚠ checkbox meios pag. We can not support a function callback */}
         <Heading mt={4} fontFamily="heading" fontSize="sm" color="gray.2">
           Meios de pagamento aceitos
         </Heading>
