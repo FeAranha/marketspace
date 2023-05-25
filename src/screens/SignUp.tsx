@@ -7,21 +7,28 @@ import {
   ScrollView,
   Image,
   HStack,
+  useToast,
 } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
 import LogoSvg from "@assets/logo.svg";
 import { Input } from "@components/Input";
-import { TouchableOpacity } from "react-native";
+import { Alert, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import { Button } from "@components/Button";
 import EditButtonSVG from "@assets/buttonEdit.svg";
 import userPhotoDefault from "@assets/userPhotoDefault.png";
 import { useNavigation } from "@react-navigation/native";
 import { useForm, Controller } from "react-hook-form";
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { api } from "@services/api";
+import { useAuth } from "@hooks/useAuth";
+import axios from "axios";
 
 type FormDataProps = {
+  avatar: string;
   name: string;
   email: string;
   phone: string;
@@ -35,7 +42,7 @@ const signUpSchema = yup.object({
   password: yup
     .string()
     .required("Informe a senha")
-    .min(8, "A senha deve ter pelo menos 8 dígitos."),
+    .min(6, "A senha deve ter pelo menos 6 dígitos."),
   password_confirm: yup
     .string()
     .required("Confirme a senha.")
@@ -43,7 +50,14 @@ const signUpSchema = yup.object({
 });
 
 export function SignUp() {
-  const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
+  const { user, updateUserProfile } = useAuth();
+  const toast = useToast();
+  const [photoIsLoading, setPhotoIsLoading] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
     resolver: yupResolver(signUpSchema),
   });
 
@@ -54,14 +68,85 @@ export function SignUp() {
     navigation.goBack();
   }
 
-  function handleSignUp({
+  async function handleUserPhotoSelect() {
+    setPhotoIsLoading(true);
+
+    try {
+      const photoSelected = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 1,
+        aspect: [4, 4],
+        allowsEditing: true,
+      });
+
+      if (photoSelected.canceled) {
+        return;
+      }
+
+      if (photoSelected.assets[0].uri) {
+        const photoInfo = await FileSystem.getInfoAsync(
+          photoSelected.assets[0].uri
+        );
+        if (photoInfo.size && (photoInfo.size / 1024 / 1024) > 5) {
+          return toast.show({
+            title: "Essa imagem utrapassou o limite de 5MB",
+            placement: "top",
+            bgColor: "red.500",
+          });
+        }
+        const fileExtension = photoSelected.assets[0].uri.split(".").pop();
+
+        const photoFile = {
+          name: `${user.name}.${fileExtension}`.toLowerCase(),
+          uri: photoSelected.assets[0].uri,
+          type: `${photoSelected.assets[0].type}/${fileExtension}`,
+        } as any;
+
+        const userPhotoUploadForm = new FormData();
+
+        userPhotoUploadForm.append("avatar", photoFile);
+
+        const avatarUpdatedResponse = await api.patch("/users/avatar", userPhotoUploadForm, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        const userUpdated = user;
+
+        userUpdated.avatar = avatarUpdatedResponse.data.avatar;
+
+        await updateUserProfile(userUpdated);
+
+        toast.show({
+          title: "Foto atualizada!",
+          placement: "top",
+          bgColor: "green.500",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setPhotoIsLoading(false);
+    }
+
+  }
+
+  async function handleSignUp({
+    avatar,
     name,
     email,
     phone,
     password,
-    password_confirm,
   }: FormDataProps) {
-    console.log({ name, email, phone, password, password_confirm });
+    try {
+      const response = await api.post('/users', {name, email, password, avatar, phone });
+      console.log(response.data);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        Alert.alert(error.response?.data.message);
+      }
+    }
   }
 
   return (
@@ -96,7 +181,7 @@ export function SignUp() {
                 source={userPhotoDefault}
                 alt="user photo default"
               />
-              <TouchableOpacity>
+              <TouchableOpacity onPress={handleUserPhotoSelect}>
                 <EditButtonSVG />
               </TouchableOpacity>
             </HStack>
@@ -206,7 +291,8 @@ export function SignUp() {
               bgColor="gray.1"
               mt={6}
               mb={12}
-              onPress={handleSubmit(handleSignUp)}/>
+              onPress={handleSubmit(handleSignUp)}
+            />
 
             <Text fontFamily="body" fontSize="sm" color="gray.2">
               Já tem uma conta?

@@ -58,7 +58,7 @@ export function SignIn() {
               }
               placeholder="Senha"
             />
-            <Button title="Entrar" mt={8} mb={16} />
+            <Button title="Entrar" mt={8} mb={16}  />
           </Center>
         </VStack>
 
