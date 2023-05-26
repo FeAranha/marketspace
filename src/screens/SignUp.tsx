@@ -92,7 +92,7 @@ export function SignUp() {
     navigation.goBack();
   }
 
-  const { singIn } = useAuth();
+  const { signIn } = useAuth();
 
   const handleUserPhotoSelect = async () => {
     try {
@@ -186,7 +186,7 @@ export function SignUp() {
         },
       })
 
-      await singIn(email, password)
+      await signIn(email, password)
     }catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
@@ -245,7 +245,7 @@ export function SignUp() {
                 alt="User Image"
               />
             ) : (
-              <Image source={userPhotoDefault} alt="User Image" />
+              <Image ml={24} mt={8} source={userPhotoDefault} alt="User Image" />
             )}
               <TouchableOpacity onPress={handleUserPhotoSelect}>
                 <EditButtonSVG />
