@@ -12,7 +12,7 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import LogoSvg from "@assets/logo.svg";
 import { Input } from "@components/Input";
-import { Alert, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { useState } from "react";
 import { Button } from "@components/Button";
 import EditButtonSVG from "@assets/buttonEdit.svg";
@@ -25,19 +25,30 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { api } from "@services/api";
 import { useAuth } from "@hooks/useAuth";
-import axios from "axios";
+import { AppError } from "@utils/AppError";
+import { UserDTO } from "@dtos/UserDTO";
+import { Loading } from "@components/Loading";
+
+type userImageSelectedProps = {
+  selected: boolean;
+  photo: {
+    uri: string;
+    name: string;
+    type: string;
+  };
+};
 
 type FormDataProps = {
-  avatar: string;
   name: string;
   email: string;
-  phone: string;
+  phoneNumber: string;
   password: string;
   password_confirm: string;
 };
 
 const signUpSchema = yup.object({
   name: yup.string().required("Informe o nome."),
+  phoneNumber: yup.string().required("Informe seu número."),
   email: yup.string().required("Informe o e-mail").email("E-mail inválido."),
   password: yup
     .string()
@@ -50,27 +61,40 @@ const signUpSchema = yup.object({
 });
 
 export function SignUp() {
-  const { user, updateUserProfile } = useAuth();
+  const [show, setShow] = useState(false);
+  const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const [userImageSelected, setUserImageSelected] = useState({
+    selected: false,
+  } as userImageSelectedProps);
   const toast = useToast();
-  const [photoIsLoading, setPhotoIsLoading] = useState(false);
+  
   const {
     control,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<FormDataProps>({
+    defaultValues: {
+      name: "",
+      email: "",
+      phoneNumber: "",
+      password: "",
+      password_confirm: "",
+    },
     resolver: yupResolver(signUpSchema),
   });
-
-  const [show, setShow] = useState(false);
-  const navigation = useNavigation();
-
+  
+  const userForm = new FormData();
+  
   function handleGoBack() {
     navigation.goBack();
   }
 
-  async function handleUserPhotoSelect() {
-    setPhotoIsLoading(true);
+  const { singIn } = useAuth();
 
+  const handleUserPhotoSelect = async () => {
     try {
       const photoSelected = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -87,7 +111,7 @@ export function SignUp() {
         const photoInfo = await FileSystem.getInfoAsync(
           photoSelected.assets[0].uri
         );
-        if (photoInfo.size && (photoInfo.size / 1024 / 1024) > 5) {
+        if (photoInfo.size && photoInfo.size / 1024 / 1024 > 5) {
           return toast.show({
             title: "Essa imagem utrapassou o limite de 5MB",
             placement: "top",
@@ -97,57 +121,89 @@ export function SignUp() {
         const fileExtension = photoSelected.assets[0].uri.split(".").pop();
 
         const photoFile = {
-          name: `${user.name}.${fileExtension}`.toLowerCase(),
+          name: `${fileExtension}`.toLowerCase(),
           uri: photoSelected.assets[0].uri,
           type: `${photoSelected.assets[0].type}/${fileExtension}`,
         } as any;
 
-        const userPhotoUploadForm = new FormData();
-
-        userPhotoUploadForm.append("avatar", photoFile);
-
-        const avatarUpdatedResponse = await api.patch("/users/avatar", userPhotoUploadForm, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        const userUpdated = user;
-
-        userUpdated.avatar = avatarUpdatedResponse.data.avatar;
-
-        await updateUserProfile(userUpdated);
+        setUserImageSelected({
+          selected: true,
+          photo: { ...photoFile },
+        })
 
         toast.show({
-          title: "Foto atualizada!",
+          title: "Foto selecionada!",
           placement: "top",
           bgColor: "green.500",
         });
       }
+
     } catch (error) {
       console.log(error);
+      toast.show({
+        title: "Erro! Tente novamente mais tarde!",
+        placement: "top",
+        bgColor: "red.500",
+      });
     } finally {
-      setPhotoIsLoading(false);
+      setIsLoading(false);
     }
-
   }
 
-  async function handleSignUp({
-    avatar,
+  const handleSignUp = async ({
     name,
     email,
-    phone,
     password,
-  }: FormDataProps) {
+    phoneNumber,
+  }: FormDataProps) => {
     try {
-      const response = await api.post('/users', {name, email, password, avatar, phone });
-      console.log(response.data);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        Alert.alert(error.response?.data.message);
+      if (!userImageSelected.selected) {
+        return toast.show({
+          title: "Por favor selecione uma imagem!",
+          placement: "top",
+          bgColor: "red.500",
+        })
       }
+
+      const { name } = getValues();
+
+      const userImage = {
+        ...userImageSelected.photo,
+        name: `${name}.${userImageSelected.photo.name}`.toLowerCase(),
+      };
+
+      userForm.append("avatar", userImage);
+      userForm.append("name", name.toLowerCase());
+      userForm.append("email", email.toLowerCase());
+      userForm.append("tel", phoneNumber);
+      userForm.append("password", password);
+
+      setIsLoading(true);
+
+      await api.post("/users", userForm, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+
+      await singIn(email, password)
+    }catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível criar a conta. Tente novamente mais tarde.";
+
+      if (isAppError) {
+        toast.show({
+          title,
+          placement: "top",
+          bgColor: "red.500",
+        });
+      }
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <ScrollView
@@ -174,13 +230,23 @@ export function SignUp() {
               alignItems="flex-end"
               mb={4}
             >
+              {userImageSelected.selected ? (
               <Image
                 mt={8}
-                mb={4}
                 ml={24}
-                source={userPhotoDefault}
-                alt="user photo default"
+                w="20"
+                h="20"
+                borderRadius="full"
+                borderWidth="2"
+                borderColor="blue.5"
+                source={{
+                  uri: userImageSelected.photo.uri,
+                }}
+                alt="User Image"
               />
+            ) : (
+              <Image source={userPhotoDefault} alt="User Image" />
+            )}
               <TouchableOpacity onPress={handleUserPhotoSelect}>
                 <EditButtonSVG />
               </TouchableOpacity>
@@ -215,13 +281,13 @@ export function SignUp() {
 
             <Controller
               control={control}
-              name="phone"
+              name="phoneNumber"
               render={({ field: { onChange, value } }) => (
                 <Input
                   placeholder="Telefone"
                   onChangeText={onChange}
                   value={value}
-                  errorMessage={errors.phone?.message}
+                  errorMessage={errors.phoneNumber?.message}
                 />
               )}
             />
@@ -247,7 +313,6 @@ export function SignUp() {
                     </TouchableOpacity>
                   }
                   placeholder="Senha"
-                  //secureTextEntry
                   onChangeText={onChange}
                   value={value}
                   errorMessage={errors.password?.message}
