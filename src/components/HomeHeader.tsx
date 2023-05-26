@@ -4,10 +4,12 @@ import { Button } from "./Button";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { useAuth } from "@hooks/useAuth";
 
 type Props = {}
 
 export function HomeHeader({...rest}: Props) {
+  const { user } = useAuth()
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   
   function goCreateAD(){
@@ -21,8 +23,7 @@ export function HomeHeader({...rest}: Props) {
           Boas vindas,
         </Text>
         <Heading fontFamily="heading" fontSize="md" color="gray.1">
-          {/* //API bem vindo user */}
-          Maria!
+          {user.name}
         </Heading>
       </VStack>
       <Button
