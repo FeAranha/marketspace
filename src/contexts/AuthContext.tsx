@@ -20,6 +20,7 @@ export type AuthContextDataProps = {
   signIn: (email: string, password: string) => void;
   token: string;
   signOut: () => void;
+  isLoadingUserStorageData: boolean;
 };
 
 type AuthContextProviderProps = {
@@ -97,7 +98,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const signIn = async (email: string, password: string) => {
     try {
       const { data } = await api.post("/sessions", { email, password });
-
       if (data.user && data.token) {
         await storageUserAndTokenSave(data.user, data.token);
         userAndTokenUpdate(data.user, data.token);
@@ -114,7 +114,13 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, signIn, token, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      signIn, 
+      token, 
+      signOut,
+      isLoadingUserStorageData, 
+      }}>
       {children}
     </AuthContext.Provider>
   );
