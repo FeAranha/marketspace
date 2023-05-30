@@ -132,11 +132,31 @@ export const PreviewAD = (): ReactElement => {
             </Text>
           </VStack>
         </Center>
-        <Image
-          source={bicicletaImg}
-          alt="foto de um bicicleta de corrida"
-          w="100%"
-        />
+
+        <Carousel
+            loop
+            width={width}
+            height={320}
+            autoPlay={productImgs.length > 1}
+            data={productImgs}
+            scrollAnimationDuration={1000}
+            renderItem={({ item }) => (
+              <Image
+                w="full"
+                h={80}
+                source={{
+                  uri: item.uri
+                    ? item.uri
+                    : `${api.defaults.baseURL}/images/${item.path}`,
+                }}
+                alt="Ad Image"
+                resizeMode="cover"
+                borderColor="gray.400"
+                borderWidth={1}
+              />
+            )}
+          />
+        
         <ProductDetails />
 
         <HStack
