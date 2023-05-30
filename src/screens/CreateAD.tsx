@@ -1,62 +1,87 @@
 import { useState } from "react";
+import { LogBox } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigation } from "@react-navigation/native";
+import { ScrollView } from "react-native-virtualized-view";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import {
-  HStack,
-  Heading,
   Icon,
   Text,
-  VStack,
-  Pressable,
-  TextArea,
-  InputLeftAddon,
-  Switch,
-  Checkbox,
+  Image,
   Center,
+  VStack,
+  HStack,
+  Switch,
+  Heading,
   useToast,
+  TextArea,
+  useTheme,
+  Checkbox,
+  InputLeftAddon,
+  Button as NativeButton,
+  Radio,
 } from "native-base";
 
 import { Feather } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
-import { ProductImg } from "@components/ProductImg";
-import { ScrollView } from "react-native-virtualized-view";
 import { ScreenHeader } from "@components/ScreenHeader";
-import { CheckboxCircle } from "@components/CheckboxCircle";
+import { AppError } from "@utils/AppError";
+
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { Plus } from "phosphor-react-native";
+
+const createAdSchema = yup.object({
+  title: yup
+    .string()
+    .required("Informe um título.")
+    .min(2, "O título deve ter no mínimo 2 letras."),
+  description: yup
+    .string()
+    .required("Informe uma descrição.")
+    .min(12, "A descrição deve ser detalhada!"),
+  price: yup.string().required("Informe um preço."),
+});
 
 type FormDataProps = {
-  titleAd: string;
-  descAd: string;
-  newProduct: boolean;
-  priceProduct: number;
-  traded: boolean;
-  meiosPag: string;
+  title: string;
+  description: string;
+  price: string;
 };
 
 export function CreateAD() {
-  const navigation = useNavigation<AppNavigatorRoutesProps>();
-  const [isSelected, setSelection] = useState(false);
-  const [isNew, setisNew] = useState(false);
+  const [isNew, setIsNew] = useState(false);
+  const [paymentMethods, setPaymentMethods] = useState<string[]>([]);
   const [isTraded, setisTraded] = useState(false);
-  const [groupValues, setGroupValues] = useState([]);
-  const [productImg, setProductImg] = useState("notnull🙄");
-  const [isNewImgProduct, setIsNewImgProduct] = useState(false);
+  const [productImgs, setProductImg] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
+  const { colors } = useTheme();
   const toast = useToast();
 
-  const { control, handleSubmit } = useForm<FormDataProps>();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
+    defaultValues: {
+      title: "",
+      description: "",
+      price: "",
+    },
+    resolver: yupResolver(createAdSchema),
+  });
 
   function handleGoBack() {
     navigation.goBack();
   }
 
   async function handleProductImgSelect() {
-    setIsNewImgProduct(true);
-
     try {
       const imgSelected = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -69,10 +94,14 @@ export function CreateAD() {
         return;
       }
 
+      if (productImgs.length > 2) {
+        throw new AppError("Só pode selecionar 3 fotos!");
+      }
+
       if (imgSelected.assets[0].uri) {
         const imgInfo = await FileSystem.getInfoAsync(
           imgSelected.assets[0].uri
-        ); //⚠ size não afeta
+        );
         if (imgInfo.size && imgInfo.size / 1024 / 1024 > 5) {
           return toast.show({
             title: "Essa imagem utrapassou o limite de 5MB",
@@ -80,35 +109,73 @@ export function CreateAD() {
             bgColor: "red.500",
           });
         }
-        setProductImg(imgSelected.assets[0].uri);
+
+        const fileExtension = imgSelected.assets[0].uri.split(".").pop();
+
+        const imgFile = {
+          name: `${fileExtension}`.toLowerCase(),
+          uri: imgSelected.assets[0].uri,
+          type: `${imgSelected.assets[0].type}/${fileExtension}`,
+        } as any;
+
+        setProductImg((productImgs) => {
+          return [...productImgs, imgFile];
+        });
+
+        toast.show({
+          title: "Foto selecionada!",
+          placement: "top",
+          bgColor: "green.500",
+        });
       }
     } catch (error) {
-      console.log(error);
-    } finally {
-      setIsNewImgProduct(false);
-    }
-  }
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível selecionar a imagem. Tente novamente!";
 
-  function handleCheck() {
-    setSelection(!isSelected);
-    setisNew(!isNew);
+      if (isAppError) {
+        toast.show({
+          title,
+          placement: "top",
+          bgColor: "red.500",
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   function goMyADs() {
     navigation.navigate("myads");
   }
 
-  function goPreviewAD() {
-    console.log(
-      "Nome: ",
-      "| Desc: ",
-      "| é novo:", isSelected,
-      "| Price: ",
-      "| é trocavel?", isTraded,
-      "| Meios Pag: ", groupValues
-    );
+  function handlePreviewAD({ title, description, price }: FormDataProps) {
+    if (productImgs.length === 0) {
+      return toast.show({
+        title: "Selecione ao menos uma imagem!",
+        placement: "top",
+        bgColor: "red.500",
+      });
+    }
 
-    navigation.navigate("previewad");
+    if (paymentMethods.length === 0) {
+      return toast.show({
+        title: "Selecione ao menos um meio de pagamento!",
+        placement: "top",
+        bgColor: "red.500",
+      });
+    }
+
+    navigation.navigate("previewad", {
+      title,
+      description,
+      productImgs,
+      price,
+      paymentMethods,
+      isNew,
+      isTraded,
+    });
   }
 
   return (
@@ -137,170 +204,185 @@ export function CreateAD() {
         <Text mb={4} fontFamily="body" fontSize="sm" color="gray.3">
           Escolha até 3 imagens para mostrar o quanto seu produto é incrível!
         </Text>
-        {/* TODO carrossel de imagens */}
+
         <HStack>
-          {isNewImgProduct ? (
-            <>
-              <ProductImg
-                size={100}
-                source={{ uri: productImg }}
+          {productImgs.length > 0 &&
+            productImgs.map((imageData) => (
+              <Image
+                w={88}
+                h={88}
+                mr={2}
+                source={{
+                  uri: imageData.uri,
+                }}
                 alt="Imagem do produto"
+                resizeMode="cover"
+                borderRadius={8}
+                key={imageData.uri}
               />
-              <Pressable
-                ml={2}
-                background={productImg}
-                mb={8}
-                justifyContent="space-between"
-                alignContent="center"
-                alignItems="center"
-                w={100}
-                h={100}
-                bg="gray.5"
-                rounded={6}
-                onPress={handleProductImgSelect}
-              >
-                <Icon
-                  as={<AntDesign name="plus" />}
-                  size={8}
-                  color="gray.4"
-                  mt={8}
-                />
-              </Pressable>
-            </>
-          ) : (
-            <>
-              <ProductImg
-                size={100}
-                source={{ uri: productImg }}
-                alt="Imagem do produto"
-              />
-              <Pressable
-                ml={2}
-                background={productImg}
-                mb={8}
-                justifyContent="space-between"
-                alignContent="center"
-                alignItems="center"
-                w={100}
-                h={100}
-                bg="gray.5"
-                rounded={6}
-                onPress={handleProductImgSelect}
-              >
-                <Icon
-                  as={<AntDesign name="plus" />}
-                  size={8}
-                  color="gray.4"
-                  mt={8}
-                />
-              </Pressable>
-            </>
+            ))}
+          {productImgs.length < 3 && (
+            <NativeButton
+              bg="gray.500"
+              w={88}
+              h={88}
+              ml={2}
+              _pressed={{
+                borderWidth: 1,
+                bg: "gray.500",
+                borderColor: "gray.400",
+              }}
+              onPress={handleProductImgSelect}
+            >
+              <Plus color={colors.gray[400]} />
+            </NativeButton>
           )}
         </HStack>
 
-        <Heading fontFamily="heading" fontSize="md" color="gray.2">
+        <Heading mt={4} fontFamily="heading" fontSize="md" color="gray.2">
           Sobre o produto
         </Heading>
 
-        <Input mt={4} placeholder="Título do anúncio" fontSize="md" />
-
-        <TextArea
-          h={160}
-          placeholder="Descrição do produto"
-          w="full"
-          maxW="full"
-          autoCompleteType={undefined}
-          fontFamily="body"
-          fontSize="md"
-          color="gray.2"
-          bg="gray.7"
-          rounded={8}
-          borderWidth={0}
-          _focus={{
-            bg: "gray.7",
-            borderWidth: 1,
-            borderColor: "gray.3",
-          }}
+        <Controller
+          control={control}
+          name="title"
+          rules={{ required: "Informe o título" }}
+          render={({ field: { onChange, value } }) => (
+            <Input
+              mt={4}
+              placeholder="Título do anúncio"
+              fontSize="md"
+              onChangeText={onChange}
+              value={value}
+              errorMessage={errors.title?.message}
+            />
+          )}
         />
-        <HStack
-          alignItems="center"
-          direction={{ base: "row", md: "row" }}
-          justifyContent="space-between"
+
+        <Controller
+          control={control}
+          name="description"
+          rules={{ required: "Informe a descrição" }}
+          render={({ field: { onChange, value } }) => (
+            <TextArea
+              h={160}
+              placeholder="Descrição do produto"
+              w="full"
+              maxW="full"
+              autoCompleteType={undefined}
+              fontFamily="body"
+              fontSize="md"
+              color="gray.2"
+              bg="gray.7"
+              rounded={8}
+              borderWidth={0}
+              _focus={{
+                bg: "gray.7",
+                borderWidth: 1,
+                borderColor: "gray.3",
+              }}
+              onChangeText={onChange}
+              value={value}
+              //errorMessage={errors.description?.message}
+            />
+          )}
+        />
+
+        <Radio.Group
+          name="productCondition"
+          value={isNew ? "new" : "used"}
+          onChange={(nextValue) => {
+            setIsNew(nextValue === "new" ? true : false);
+          }}
         >
-          <HStack alignItems="center">
-            <CheckboxCircle onPress={handleCheck} checked={isSelected} />
-            <Text fontFamily="body" fontSize="md" color="gray.2">
-              Produto novo
-            </Text>
+          <HStack>
+            <Radio value="new" my="2" size="sm">
+              <Text color="gray.2" fontSize={14}>
+                Produto novo
+              </Text>
+            </Radio>
+            <Radio value="used" my="2" ml={5} size="sm">
+              <Text color="gray.2" fontSize={14}>
+                Produto usado
+              </Text>
+            </Radio>
           </HStack>
-          <HStack alignItems="center">
-            <CheckboxCircle onPress={handleCheck} checked={!isSelected} />
-            <Text fontFamily="body" fontSize="md" color="gray.2">
-              Produto usado
-            </Text>
-          </HStack>
-        </HStack>
+        </Radio.Group>
+
         <Heading mt={8} fontFamily="heading" fontSize="md" color="gray.2">
           Venda
         </Heading>
         <HStack mt={4} alignItems="center">
-          <Input
-            InputLeftElement={
-              <InputLeftAddon
-                children={"R$"}
-                borderWidth={0}
+          <Controller
+            control={control}
+            name="price"
+            rules={{ required: "Informe o preço!" }}
+            render={({ field: { onChange, value } }) => (
+              <Input
+                InputLeftElement={
+                  <InputLeftAddon
+                    children={"R$"}
+                    borderWidth={0}
+                    fontFamily="body"
+                    fontSize="md"
+                    ml={1}
+                  />
+                }
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.price?.message}
+                placeholder="Valor do produto"
                 fontFamily="body"
                 fontSize="md"
-                ml={1}
+                w={{
+                  base: "100%",
+                }}
               />
-            }
-            placeholder="Valor do produto"
-            fontFamily="body"
-            fontSize="md"
-            w={{
-              base: "100%",
-            }}
+            )}
           />
         </HStack>
         <VStack alignItems="flex-start">
           <Heading mt={4} fontFamily="heading" fontSize="sm" color="gray.2">
             Aceita troca?
           </Heading>
-          <Switch size="lg" onChange={() => setisTraded(!isTraded)} />
+          <Switch
+            m={0}
+            size="lg"
+            onToggle={(value) => setisTraded(value)}
+            value={isTraded}
+          />
         </VStack>
-        {/* ⚛ Meios Pag */}
-        {/* ⚠ checkbox meios pag. We can not support a function callback */}
+
         <Heading mt={4} fontFamily="heading" fontSize="sm" color="gray.2">
           Meios de pagamento aceitos
         </Heading>
-
         <Checkbox.Group
-          onChange={setGroupValues}
-          value={groupValues}
-          accessibilityLabel="choose numbers"
+          onChange={(value) => setPaymentMethods(value)}
+          value={paymentMethods}
+          accessibilityLabel="Escolha o método de pagamento."
         >
-          <Checkbox value="boleto" my={1}>
-            <Text fontFamily="body" fontSize="md">
+          <Checkbox value="boleto">
+            <Text color="gray.300" fontSize={16}>
               Boleto
             </Text>
           </Checkbox>
-          <Checkbox value="pix" my={1}>
-            <Text fontFamily="body" fontSize="md">
+          <Checkbox value="pix">
+            <Text color="gray.300" fontSize={16}>
               Pix
             </Text>
           </Checkbox>
-          <Checkbox value="dinheiro" my={1}>
-            <Text fontFamily="body" fontSize="md">
+          <Checkbox value="cash">
+            <Text color="gray.300" fontSize={16}>
               Dinheiro
             </Text>
           </Checkbox>
-          <Checkbox value="cartaoCredito" my={1}>
-            <Text fontFamily="body" fontSize="md">
+          <Checkbox value="card">
+            <Text color="gray.300" fontSize={16}>
               Cartão de Crédito
             </Text>
           </Checkbox>
-          <Checkbox value="depBancario" my={1}>
-            <Text fontFamily="body" fontSize="md">
+          <Checkbox value="deposit">
+            <Text color="gray.300" fontSize={16}>
               Depósito Bancário
             </Text>
           </Checkbox>
@@ -317,8 +399,19 @@ export function CreateAD() {
       >
         <Button w={40} title="Cancelar" variant="solid" onPress={goMyADs} />
 
-        <Button w={40} title="Avançar" bgColor="gray.1" onPress={goPreviewAD} />
+        <Button
+          isLoading={isLoading}
+          w={40}
+          title="Avançar"
+          bgColor="gray.1"
+          onPress={handleSubmit(handlePreviewAD)}
+        />
       </HStack>
     </ScrollView>
   );
 }
+
+// Procurando solução
+LogBox.ignoreLogs([
+  "We can not support a function callback. See Github Issues for details https://github.com/adobe/react-spectrum/issues/2320",
+]);

@@ -8,23 +8,53 @@ import {
   HStack,
   ScrollView,
   Icon,
+  useToast,
 } from "native-base";
 import bicicletaImg from "@assets/bicicleta.png";
 import { Tag } from "phosphor-react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { ReactElement } from "react";
+import { ReactElement, useState } from "react";
 import { Button } from "@components/Button";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { ProductDetails } from "@components/ProductDetails";
+import { useAuth } from "@hooks/useAuth";
+
+
+type RouteParams = {
+    title: string;
+    description: string;
+    price: string;
+    images: any[];
+    paymentMethods: string[];
+    isNew: boolean;
+    acceptTrade: boolean;
+  };
+
 
 export const PreviewAD = (): ReactElement => {
+  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
-  function goCreateAD(){
-    navigation.navigate('createad')
-  }
+  const { user } = useAuth();
 
+  const toast = useToast();
+
+  const route = useRoute();
+  const {
+    title,
+    description,
+    price,
+    images,
+    paymentMethods,
+    isNew,
+    acceptTrade,
+  } = route.params as RouteParams;
+
+  
+  const handleGoBack = () => {
+    navigation.goBack();
+  }
 
   function goMyAdDetaills(){
     navigation.navigate('myaddetails')
@@ -67,7 +97,7 @@ export const PreviewAD = (): ReactElement => {
           w={40}  
           title="Voltar e editar" 
           variant="solid" 
-          onPress={goCreateAD} 
+          onPress={handleGoBack} 
           />
 
         <Button 
