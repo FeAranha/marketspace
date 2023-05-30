@@ -1,3 +1,4 @@
+import { ReactElement, useState } from "react";
 import {
   Center,
   Heading,
@@ -10,16 +11,18 @@ import {
   Icon,
   useToast,
 } from "native-base";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import Carousel from 'react-native-reanimated-carousel';
 import bicicletaImg from "@assets/bicicleta.png";
 import { Tag } from "phosphor-react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { ReactElement, useState } from "react";
 import { Button } from "@components/Button";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { ProductDetails } from "@components/ProductDetails";
 import { useAuth } from "@hooks/useAuth";
-
+import { api } from "@services/api";
+import { AppError } from "@utils/AppError";
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { Dimensions } from "react-native";
 
 type RouteParams = {
     title: string;
@@ -28,13 +31,15 @@ type RouteParams = {
     images: any[];
     paymentMethods: string[];
     isNew: boolean;
-    acceptTrade: boolean;
+    isTraded: boolean;
   };
 
 
 export const PreviewAD = (): ReactElement => {
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation<AppNavigatorRoutesProps>();
+
+  const width = Dimensions.get("window").width;
 
   const { user } = useAuth();
 
@@ -48,7 +53,7 @@ export const PreviewAD = (): ReactElement => {
     images,
     paymentMethods,
     isNew,
-    acceptTrade,
+    isTraded,
   } = route.params as RouteParams;
 
   
@@ -56,10 +61,22 @@ export const PreviewAD = (): ReactElement => {
     navigation.goBack();
   }
 
-  function goMyAdDetaills(){
-    navigation.navigate('myaddetails')
+  function goCreateAD(){
+    navigation.navigate('createad')
   }
 
+  async function handlePublish() {
+    console.log(
+    'title:',title,
+    ', desc:',description,
+    ', price:',price,
+    ', productImg:',images,
+    ', Payment:',paymentMethods,
+    ', é novo?',isNew,
+    ', é trocavel?',isTraded,
+    )
+  }
+  
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
@@ -97,7 +114,7 @@ export const PreviewAD = (): ReactElement => {
           w={40}  
           title="Voltar e editar" 
           variant="solid" 
-          onPress={handleGoBack} 
+          onPress={goCreateAD} 
           />
 
         <Button 
@@ -105,7 +122,7 @@ export const PreviewAD = (): ReactElement => {
           leftIcon={<Icon mr={2} as={<Tag color='#EDECEE' size={16} />} />}  
           w={40} 
           title="Publicar" 
-          onPress={goMyAdDetaills} />
+          onPress={handlePublish} />
       </HStack>
       
       </Stack>
