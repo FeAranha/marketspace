@@ -30,7 +30,9 @@ type AppRoutes = {
     isTraded: boolean;
   };
   addetails: undefined;
-  myaddetails: undefined;
+  myaddetails: {
+    id: string;
+  };
 };
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRoutes>;

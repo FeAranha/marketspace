@@ -7,7 +7,7 @@ export type ProductDTO = {
   description: string;
   price: number;
   is_new: boolean;
-  accept_trade: boolean;
+  is_traded: boolean;
   product_images: ImageDTO[];
   is_active: boolean;
   payment_methods: PaymentMethodDTO[];
