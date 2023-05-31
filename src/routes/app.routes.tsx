@@ -29,7 +29,9 @@ type AppRoutes = {
     isNew: boolean;
     isTraded: boolean;
   };
-  addetails: undefined;
+  addetails: {
+    id: string;
+  }
   myaddetails: {
     id: string;
   };

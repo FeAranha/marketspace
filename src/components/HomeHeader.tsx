@@ -7,20 +7,24 @@ import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { useAuth } from "@hooks/useAuth";
 import { api } from "@services/api";
 
-type Props = {}
+type Props = {};
 
-export function HomeHeader({...rest}: Props) {
-  const { user } = useAuth()
+export function HomeHeader({ ...rest }: Props) {
+  const { user } = useAuth();
   const navigation = useNavigation<AppNavigatorRoutesProps>();
-  
-  function goCreateAD(){
-    navigation.navigate('createad')
+
+  function goCreateAD() {
+    navigation.navigate("createad");
   }
   return (
-    <HStack mt={12} alignItems="center" justifyContent='space-between'>
-      <Image source={{
-            uri: `${api.defaults.baseURL}/images/${user.avatar}`,
-          }} alt="avatar" size={45}/>
+    <HStack mt={12} alignItems="center" justifyContent="space-between">
+      <Image
+        source={{
+          uri: `${api.defaults.baseURL}/images/${user.avatar}`,
+        }}
+        alt="avatar"
+        size={45}
+      />
       <VStack>
         <Text fontFamily="body" fontSize="md" color="gray.1">
           Boas vindas,

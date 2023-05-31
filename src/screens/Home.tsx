@@ -22,6 +22,7 @@ import { Input } from "@components/Input";
 import { HomeHeader } from "@components/HomeHeader";
 import { ProductCard } from "@components/ProductCard";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { ProductDTO } from "@dtos/ProductDTO";
 
 export function Home() {
   const [searchAd, setSearchAd] = useState("");
@@ -30,15 +31,8 @@ export function Home() {
   const [isTraded, setisTraded] = useState(false);
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const [isNew, setisNew] = useState(true);
-  const [produts, setProducts] = useState([
-    "Bicicleta",
-    "Sofa",
-    "Tenis",
-    "Armario",
-    "Luminaria",
-    "Bota",
-    "Camisa",
-  ]);
+  const [products, setProducts] = useState<ProductDTO[]>([]);
+
 
   function goMyADs() {
     navigation.navigate("myads");
@@ -300,12 +294,14 @@ export function Home() {
           />
 
           <FlatList
-            data={produts}
+            data={products}
             numColumns={2}
-            keyExtractor={(item) => item}
+            keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <HStack w="50%" ml={1}>
-                <ProductCard />
+                <ProductCard 
+                id={item.id}
+                  />
               </HStack>
             )}
             showsVerticalScrollIndicator={false}
