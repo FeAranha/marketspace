@@ -13,7 +13,6 @@ import { AntDesign } from "@expo/vector-icons";
 import bicicletaImg from "@assets/bicicleta.png";
 import { ReactElement } from "react";
 import { Button } from "@components/Button";
-import { ProductDetails } from "@components/ProductDetails";
 
 export const AdDetails = (): ReactElement => {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
@@ -55,7 +54,7 @@ export const AdDetails = (): ReactElement => {
           w="100%"
           mb={5}
         />
-        <ProductDetails/>
+        
 
         <HStack alignItems="center" justifyContent='space-between' h={90} bg='gray.7' w='full' mt={26} px={6}>
             <HStack alignItems="center">

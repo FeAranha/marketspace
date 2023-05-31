@@ -17,14 +17,13 @@ import bicicletaImg from "@assets/bicicleta.png";
 import AvatarImg from "@assets/avatar.png";
 import { ReactElement, useState } from "react";
 import { Button } from "@components/Button";
-import { ProductDetails } from "@components/ProductDetails";
 
 export const MyAdDetails = (): ReactElement => {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const [adIsActive, setadIsActive] = useState(true);
 
-  function goPreviewAD() {
-    navigation.navigate("previewad");
+  function handleGoBack() {
+    navigation.navigate("myads");
   }
 
   function goCreateAD() {
@@ -54,7 +53,7 @@ export const MyAdDetails = (): ReactElement => {
             name="arrowleft"
             color="gray.1"
             size={6}
-            onPress={goPreviewAD}
+            onPress={handleGoBack}
           />
 
           <Icon
@@ -73,7 +72,6 @@ export const MyAdDetails = (): ReactElement => {
           w="100%"
           mb={5}
         />
-        <ProductDetails/>
       </Stack>
     </ScrollView>
   );

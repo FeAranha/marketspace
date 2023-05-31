@@ -7,7 +7,7 @@ export function Logoff() {
   
   return (
     <Center flex={1}>
-      <Text>Deseja sair? </Text> 
+      <Text>Deseja sair?{user.name} </Text> 
         <Button mt={4} h={10} title="SIM" onPress={signOut} />
     </Center>
   )

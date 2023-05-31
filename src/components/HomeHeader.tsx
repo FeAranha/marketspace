@@ -5,6 +5,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { useAuth } from "@hooks/useAuth";
+import { api } from "@services/api";
 
 type Props = {}
 
@@ -17,7 +18,9 @@ export function HomeHeader({...rest}: Props) {
   }
   return (
     <HStack mt={12} alignItems="center" justifyContent='space-between'>
-      <Image source={AvatarImg} alt="avatar" size={45}/>
+      <Image source={{
+            uri: `${api.defaults.baseURL}/images/${user.avatar}`,
+          }} alt="avatar" size={45}/>
       <VStack>
         <Text fontFamily="body" fontSize="md" color="gray.1">
           Boas vindas,

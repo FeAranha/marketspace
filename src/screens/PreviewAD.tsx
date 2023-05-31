@@ -10,19 +10,19 @@ import {
   ScrollView,
   Icon,
   useToast,
+  Box,
 } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Carousel from "react-native-reanimated-carousel";
-import bicicletaImg from "@assets/bicicleta.png";
 import { Tag } from "phosphor-react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { Button } from "@components/Button";
-import { ProductDetails } from "@components/ProductDetails";
 import { useAuth } from "@hooks/useAuth";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { Dimensions } from "react-native";
+import { generatePaymentMethods } from "@utils/generatePaymentMethods";
 
 type RouteParams = {
   title: string;
@@ -55,10 +55,6 @@ export const PreviewAD = (): ReactElement => {
     isTraded,
   } = route.params as RouteParams;
 
-  const handleGoBack = () => {
-    navigation.goBack();
-  };
-
   function goCreateAD() {
     navigation.navigate("createad");
   }
@@ -73,7 +69,7 @@ export const PreviewAD = (): ReactElement => {
         price: parseInt(price.replace(/[^0-9]/g, "")),
         payment_methods: paymentMethods,
         is_new: isNew,
-        is_traded: isTraded,
+        accept_trade: isTraded,
       });
 
       const imgData = new FormData();
@@ -156,8 +152,57 @@ export const PreviewAD = (): ReactElement => {
               />
             )}
           />
-        
-        <ProductDetails />
+
+        <VStack m={6}>
+        <HStack>
+        <Image
+          mr={2}
+          source={{
+            uri: `${api.defaults.baseURL}/images/${user.avatar}`,
+          }}
+          alt="avatar"
+          size={6}
+        />
+        <Text fontFamily="body" fontSize="sm">
+          {user.name}
+        </Text>
+      </HStack>
+
+      <Box mt={6} h={4} w={12} alignItems="center" rounded="full" bg="blue.5">
+        <Text fontFamily="heading" fontSize="ss" color="white">
+          {isNew ? "Novo" : "Usado"}
+        </Text>
+      </Box>
+
+      <HStack mt={2} alignItems="center" justifyContent="space-between">
+        <Heading fontFamily="heading" fontSize="lg" color="gray.1">
+          {title}
+        </Heading>
+        <HStack alignItems="center">
+          <Heading mr={1} fontFamily="heading" fontSize="sm" color="blue.5">
+            R${""}
+          </Heading>
+          <Heading fontFamily="heading" fontSize="lg" color="blue.5">
+            {price}
+          </Heading>
+        </HStack>
+      </HStack>
+
+      <Text mt={2} color="gray.2" fontFamily="body" fontSize="sm">
+        {description}
+      </Text>
+
+      <HStack my={4} alignItems="center">
+        <Heading fontSize="sm" fontFamily="heading" color="gray.2">
+          Aceita troca?{""}
+        </Heading>
+        <Text ml={2} fontSize="sm" fontFamily="body">
+          {isTraded ? "Sim" : "Não"}
+        </Text>
+      </HStack>
+
+      {generatePaymentMethods(paymentMethods, '#1A181B')}
+      </VStack>
 
         <HStack
           bg="gray.7"

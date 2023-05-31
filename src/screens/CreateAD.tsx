@@ -362,27 +362,27 @@ export function CreateAD() {
           accessibilityLabel="Escolha o método de pagamento."
         >
           <Checkbox value="boleto">
-            <Text color="gray.300" fontSize={16}>
+            <Text color="gray.2" fontSize={16}>
               Boleto
             </Text>
           </Checkbox>
           <Checkbox value="pix">
-            <Text color="gray.300" fontSize={16}>
+            <Text color="gray.2" fontSize={16}>
               Pix
             </Text>
           </Checkbox>
           <Checkbox value="cash">
-            <Text color="gray.300" fontSize={16}>
+            <Text color="gray.2" fontSize={16}>
               Dinheiro
             </Text>
           </Checkbox>
           <Checkbox value="card">
-            <Text color="gray.300" fontSize={16}>
+            <Text color="gray.2" fontSize={16}>
               Cartão de Crédito
             </Text>
           </Checkbox>
           <Checkbox value="deposit">
-            <Text color="gray.300" fontSize={16}>
+            <Text color="gray.2" fontSize={16}>
               Depósito Bancário
             </Text>
           </Checkbox>
