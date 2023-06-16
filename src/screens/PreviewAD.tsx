@@ -32,6 +32,7 @@ type RouteParams = {
   paymentMethods: string[];
   isNew: boolean;
   isTraded: boolean;
+  isActive?: boolean;
 };
 
 export const PreviewAD = (): ReactElement => {
@@ -53,6 +54,7 @@ export const PreviewAD = (): ReactElement => {
     paymentMethods,
     isNew,
     isTraded,
+    isActive,
   } = route.params as RouteParams;
 
   function goCreateAD() {
@@ -93,6 +95,14 @@ export const PreviewAD = (): ReactElement => {
 
       navigation.navigate('myaddetails', {
         id: product.data.id,
+        description,
+        isActive,
+        isNew,
+        isTraded,
+        paymentMethods,
+        price,
+        productImgs,
+        title,
       })
     } catch (error) {
       const isAppError = error instanceof AppError
@@ -168,7 +178,7 @@ export const PreviewAD = (): ReactElement => {
         </Text>
       </HStack>
 
-      <Box mt={6} h={4} w={12} alignItems="center" rounded="full" bg="blue.5">
+      <Box mt={6} h={4} w={12} alignItems="center" rounded="full" bg={isNew ? "blue.5" : 'gray.2'}>
         <Text fontFamily="heading" fontSize="ss" color="white">
           {isNew ? "Novo" : "Usado"}
         </Text>
@@ -194,7 +204,7 @@ export const PreviewAD = (): ReactElement => {
 
       <HStack my={4} alignItems="center">
         <Heading fontSize="sm" fontFamily="heading" color="gray.2">
-          Aceita troca?{""}
+          Aceita troca?{" "}
         </Heading>
         <Text ml={2} fontSize="sm" fontFamily="body">
           {isTraded ? "Sim" : "Não"}

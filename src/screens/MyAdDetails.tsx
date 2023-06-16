@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import {
   HStack,
@@ -9,70 +9,208 @@ import {
   Heading,
   Box,
   VStack,
+  useToast,
   ScrollView,
 } from "native-base";
 import { Bank, Barcode, QrCode, Tag } from "phosphor-react-native";
 import { AntDesign } from "@expo/vector-icons";
 import bicicletaImg from "@assets/bicicleta.png";
 import AvatarImg from "@assets/avatar.png";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { Button } from "@components/Button";
+import { Loading } from "@components/Loading";
+import { api } from "@services/api";
+import { AppError } from "@utils/AppError";
+import { ProductDTO } from "../dtos/ProductDTO";
+import { ProductDetails } from "@components/ProductDetails";
+import { useAuth } from "@hooks/useAuth";
+
+type RouteParams = {
+  id: string;
+  title: string;
+  description: string;
+  productImgs: any[];
+  price: string;
+  paymentMethods: string[];
+  isNew: boolean;
+  isTraded: boolean;
+  isActive: boolean;
+};
 
 export const MyAdDetails = (): ReactElement => {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
-  const [adIsActive, setadIsActive] = useState(true);
+  const [adActive, setAdActive] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDeletingLoading, setIsDeletingLoading] = useState(false);
+  const { user } = useAuth();
+  const route = useRoute();
+  const toast = useToast();
+
+  const { 
+    id,
+    title,
+    description,
+    productImgs,
+    price,
+    paymentMethods,
+    isNew,
+    isTraded,
+    isActive,
+  } = route.params as RouteParams;
+  
+  const [product, setProduct] = useState({} as ProductDTO);
 
   function handleGoBack() {
     navigation.navigate("myads");
   }
 
-  function goCreateAD() {
-    navigation.navigate("createad");
-  }
+  const handleGoEditAd = () => {
+    // navigation.navigate("editad", {
+    //   title: product.name,
+    //   description: product.description,
+    //   price: product.price.toString(),
+    //   images: product.product_images,
+    //   paymentMethods: product.payment_methods.map((item) => item.key),
+    //   isNew: product.is_new,
+    //   acceptTrade: product.accept_trade,
+    //   id: product.id,
+    // });
+  };
 
-  function handleDisableAD() {
-    setadIsActive(false);
-  }
+  const handleChangeActive = async () => {
+    try {
+      setAdActive(true);
+      const data = await api.patch(`products/${id}`, {
+        is_active: !product.is_active,
+      });
+
+      setProduct((state) => {
+        return {
+          ...state,
+          is_active: !state.is_active,
+        };
+      });
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível deletar. Tente Novamente!";
+
+      if (isAppError) {
+        toast.show({
+          title,
+          placement: "top",
+          bgColor: "red.500",
+        });
+      }
+    } finally {
+      setAdActive(false);
+    }
+  };
+
+  const handleDeleteAd = async () => {
+    try {
+      setIsDeletingLoading(true);
+      await api.delete(`products/${id}`);
+
+      navigation.navigate("myads");
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível deletar. Tente Novamente!";
+
+      if (isAppError) {
+        toast.show({
+          title,
+          placement: "top",
+          bgColor: "red.500",
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const productData = await api.get(`products/${id}`);
+        setProduct(productData.data);
+        setIsLoading(false);
+      } catch (error) {
+        const isAppError = error instanceof AppError;
+        const title = isAppError
+          ? error.message
+          : "Não foi possível receber os dados do anúncio. Tente Novamente!";
+
+        if (isAppError) {
+          toast.show({
+            title,
+            placement: "top",
+            bgColor: "red.500",
+          });
+        }
+      }
+    };
+    loadData();
+  }, []);
 
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
       showsVerticalScrollIndicator={false}
     >
-      <Stack flex={1} bg="gray.6">
-        <HStack
-          px={6}
-          pb={4}
-          pt={12}
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <Icon
-            mt={2}
-            as={AntDesign}
-            name="arrowleft"
-            color="gray.1"
-            size={6}
-            onPress={handleGoBack}
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <Stack flex={1} bg="gray.6">
+          <HStack
+            h={25}
+            px={6}
+            pb={4}
+            pt={12}
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Icon
+              mt={2}
+              as={AntDesign}
+              name="arrowleft"
+              color="gray.1"
+              size={6}
+              onPress={handleGoBack}
+            />
+
+            <Icon
+              mt={2}
+              as={<AntDesign />}
+              name="edit"
+              color="gray.1"
+              size={6}
+              onPress={handleGoBack}
+            />
+          </HStack>
+
+          <Image
+            source={bicicletaImg}
+            alt="foto de um bicicleta de corrida"
+            w="100%"
+            mb={5}
           />
 
-          <Icon
-            mt={2}
-            as={<AntDesign />}
-            name="edit"
-            color="gray.1"
-            size={6}
-            onPress={goCreateAD}
+          <ProductDetails
+            id={id}
+            title={title} 
+            description={description}
+            price={price}
+            isNew={isNew}
+            acceptTrade={isTraded}
+            productImgs={productImgs}
+            paymentMethods={paymentMethods}
+            isActive={isActive}
+            profileImage={`${api.defaults.baseURL}/images/${user.avatar}`}
           />
-        </HStack>
-
-        <Image
-          source={bicicletaImg}
-          alt="foto de um bicicleta de corrida"
-          w="100%"
-          mb={5}
-        />
-      </Stack>
+        </Stack>
+      )}
     </ScrollView>
   );
 };

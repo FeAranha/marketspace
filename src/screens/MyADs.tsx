@@ -136,8 +136,17 @@ export function MyADs() {
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <HStack w="50%" ml={1}>
-                  <ProductCard 
+                  <ProductCard
                     id={item.id}
+                    image={`${api.defaults.baseURL}/images/${item.product_images[0].path}`}
+                    price={item.price
+                      .toFixed(2)
+                      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
+                    isNew={item.is_new}
+                    title={item.name}
+                    //isActive={false}
+                    //profileImage={`${api.defaults.baseURL}/images/${item.user?.avatar}`}
+                    //showProfile //: em home adicionar esta prop para exibir a foto do dono do produto
                   />
                 </HStack>
               )}

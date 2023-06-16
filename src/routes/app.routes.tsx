@@ -28,12 +28,21 @@ type AppRoutes = {
     paymentMethods: string[];
     isNew: boolean;
     isTraded: boolean;
+    isActive?: boolean;
   };
   addetails: {
     id: string;
   }
   myaddetails: {
     id: string;
+    title: string;
+    description?: string;
+    productImgs?: any[];
+    price: string;
+    paymentMethods?: string[];
+    isNew: boolean;
+    isTraded?: boolean;
+    isActive?: boolean;
   };
 };
 

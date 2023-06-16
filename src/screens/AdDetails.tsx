@@ -55,7 +55,6 @@ export const AdDetails = (): ReactElement => {
           mb={5}
         />
         
-
         <HStack alignItems="center" justifyContent='space-between' h={90} bg='gray.7' w='full' mt={26} px={6}>
             <HStack alignItems="center">
               <Heading mr={1} fontFamily="heading" fontSize="sm" color="blue.7">

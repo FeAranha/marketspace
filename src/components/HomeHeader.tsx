@@ -30,7 +30,7 @@ export function HomeHeader({ ...rest }: Props) {
           Boas vindas,
         </Text>
         <Heading fontFamily="heading" fontSize="md" color="gray.1">
-          {user.name}
+        {user.name[0].toUpperCase() + user.name.substring(1)}
         </Heading>
       </VStack>
       <Button

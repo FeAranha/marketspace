@@ -1,4 +1,4 @@
-import { Text, HStack, useTheme } from "native-base";
+import { Text, HStack, Heading } from "native-base";
 
 import {
   Barcode,
@@ -8,9 +8,15 @@ import {
   CreditCard,
 } from "phosphor-react-native";
 
-export const generatePaymentMethods = ( paymentMethods: string[], color:string ) => {
+export const generatePaymentMethods = (
+  paymentMethods: string[],
+  color: string
+) => {
   return (
     <>
+      <Heading my={4} fontSize="sm" fontFamily="heading" color="gray.2">
+        Meios de pagamento:
+      </Heading>
       {paymentMethods.includes("boleto") && (
         <HStack alignItems="center">
           <Barcode size={20} color={color} />
@@ -53,4 +59,4 @@ export const generatePaymentMethods = ( paymentMethods: string[], color:string )
       )}
     </>
   );
-}
+};
