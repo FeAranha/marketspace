@@ -13,16 +13,16 @@ import {
   Box,
 } from "native-base";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import Carousel from "react-native-reanimated-carousel";
 import { Tag } from "phosphor-react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { Button } from "@components/Button";
+import { Carrossel } from "@components/Carrossel";
 import { useAuth } from "@hooks/useAuth";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
-import { Dimensions } from "react-native";
 import { generatePaymentMethods } from "@utils/generatePaymentMethods";
+
 
 type RouteParams = {
   title: string;
@@ -39,7 +39,6 @@ export const PreviewAD = (): ReactElement => {
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
-  const width = Dimensions.get("window").width;
 
   const { user } = useAuth();
 
@@ -139,29 +138,7 @@ export const PreviewAD = (): ReactElement => {
           </VStack>
         </Center>
 
-        <Carousel
-            loop
-            width={width}
-            height={320}
-            autoPlay={productImgs.length > 1}
-            data={productImgs}
-            scrollAnimationDuration={1000}
-            renderItem={({ item }) => (
-              <Image
-                w="full"
-                h={80}
-                source={{
-                  uri: item.uri
-                    ? item.uri
-                    : `${api.defaults.baseURL}/images/${item.path}`,
-                }}
-                alt="Ad Image"
-                resizeMode="cover"
-                borderColor="gray.400"
-                borderWidth={1}
-              />
-            )}
-          />
+        <Carrossel productImgs={productImgs}/>
 
         <VStack m={6}>
         <HStack>
