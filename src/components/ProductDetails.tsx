@@ -15,7 +15,7 @@ type Props = {
   isNew: boolean;
   acceptTrade: boolean;
   productImgs: any[];
-  paymentMethods?: any[];
+  paymentMethods: any[];
   
   isActive?: boolean;
   showProfile?: boolean;
@@ -40,6 +40,8 @@ export function ProductDetails({
 }: Props) {
   const { user } = useAuth();
   const width = Dimensions.get("window").width;
+
+
 
   return (
     <VStack m={6}>
@@ -115,7 +117,7 @@ export function ProductDetails({
         </Text>
       </HStack>
       
-      {/* {generatePaymentMethods(paymentMethods, '#1A181B')} */}
+       {/* {generatePaymentMethods(paymentMethods, '#1A181B')}  */}
       
     </VStack>
   );

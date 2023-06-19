@@ -143,7 +143,7 @@ export const MyAdDetails = (): ReactElement => {
       }
     };
     loadData();
-  }, []);
+  }, [id]);
 
   return (
     <ScrollView
