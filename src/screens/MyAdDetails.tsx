@@ -3,27 +3,19 @@ import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import {
   HStack,
   Icon,
-  Image,
   Stack,
-  Text,
-  Heading,
-  Box,
-  VStack,
   useToast,
   ScrollView,
 } from "native-base";
-import { Bank, Barcode, QrCode, Tag } from "phosphor-react-native";
 import { AntDesign } from "@expo/vector-icons";
-import bicicletaImg from "@assets/bicicleta.png";
-import AvatarImg from "@assets/avatar.png";
 import { ReactElement, useEffect, useState } from "react";
-import { Button } from "@components/Button";
 import { Loading } from "@components/Loading";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
 import { ProductDTO } from "../dtos/ProductDTO";
 import { ProductDetails } from "@components/ProductDetails";
 import { useAuth } from "@hooks/useAuth";
+import { Carrossel } from "@components/Carrossel";
 
 type RouteParams = {
   id: string;
@@ -65,7 +57,7 @@ export const MyAdDetails = (): ReactElement => {
   }
 
   const handleGoEditAd = () => {
-    // navigation.navigate("editad", {
+    // navigation.navigate("createAD", {
     //   title: product.name,
     //   description: product.description,
     //   price: product.price.toString(),
@@ -190,13 +182,8 @@ export const MyAdDetails = (): ReactElement => {
             />
           </HStack>
 
-          <Image
-            source={bicicletaImg}
-            alt="foto de um bicicleta de corrida"
-            w="100%"
-            mb={5}
-          />
-
+          <Carrossel productImgs={product.product_images}/>
+          
           <ProductDetails
             id={id}
             title={title} 

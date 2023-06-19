@@ -5,6 +5,7 @@ import { api } from "@services/api";
 
 type Props = {
   productImgs: any[];
+  
 }
 
 export function Carrossel({productImgs}: Props) {
