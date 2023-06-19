@@ -16,13 +16,13 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Tag } from "phosphor-react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { Button } from "@components/Button";
-import { Carrossel } from "@components/Carrossel";
 import { useAuth } from "@hooks/useAuth";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { generatePaymentMethods } from "@utils/generatePaymentMethods";
-
+import { Dimensions } from "react-native";
+import Carousel from "react-native-reanimated-carousel";
 
 type RouteParams = {
   title: string;
@@ -38,7 +38,6 @@ type RouteParams = {
 export const PreviewAD = (): ReactElement => {
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation<AppNavigatorRoutesProps>();
-
 
   const { user } = useAuth();
 
@@ -84,15 +83,15 @@ export const PreviewAD = (): ReactElement => {
         imgData.append("images", imgFile);
       });
 
-      imgData.append("product_id", product.data.id)
+      imgData.append("product_id", product.data.id);
 
       const imgsData = await api.post("/products/images", imgData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      })
+      });
 
-      navigation.navigate('myaddetails', {
+      navigation.navigate("myaddetails", {
         id: product.data.id,
         description,
         isActive,
@@ -102,24 +101,25 @@ export const PreviewAD = (): ReactElement => {
         price,
         productImgs,
         title,
-      })
+      });
     } catch (error) {
-      const isAppError = error instanceof AppError
+      const isAppError = error instanceof AppError;
       const title = isAppError
         ? error.message
-        : 'Não foi publicado, tentar mais tarde'
+        : "Não foi publicado, tentar mais tarde";
 
-        if (isAppError) {
-          toast.show({
-            title,
-            placement: 'top',
-            bgColor: 'red.500',
-          })
-        }
+      if (isAppError) {
+        toast.show({
+          title,
+          placement: "top",
+          bgColor: "red.500",
+        });
+      }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
+  const width = Dimensions.get("window").width;
 
   return (
     <ScrollView
@@ -138,58 +138,87 @@ export const PreviewAD = (): ReactElement => {
           </VStack>
         </Center>
 
-        <Carrossel productImgs={productImgs}/>
+        <Carousel
+          loop
+          width={width}
+          height={320}
+          autoPlay={productImgs.length > 1}
+          data={productImgs}
+          scrollAnimationDuration={1000}
+          renderItem={({ item }) => (
+            <Image
+              w="full"
+              h={80}
+              source={{
+                uri: item.uri
+                  ? item.uri
+                  : `${api.defaults.baseURL}/images/${item.path}`,
+              }}
+              alt="Ad Image"
+              resizeMode="cover"
+              borderColor="gray.400"
+              borderWidth={1}
+            />
+          )}
+        />
 
         <VStack m={6}>
-        <HStack>
-        <Image
-          mr={2}
-          source={{
-            uri: `${api.defaults.baseURL}/images/${user.avatar}`,
-          }}
-          alt="avatar"
-          size={6}
-        />
-        <Text fontFamily="body" fontSize="sm">
-          {user.name}
-        </Text>
-      </HStack>
+          <HStack>
+            <Image
+              mr={2}
+              source={{
+                uri: `${api.defaults.baseURL}/images/${user.avatar}`,
+              }}
+              alt="avatar"
+              size={6}
+            />
+            <Text fontFamily="body" fontSize="sm">
+              {user.name}
+            </Text>
+          </HStack>
 
-      <Box mt={6} h={4} w={12} alignItems="center" rounded="full" bg={isNew ? "blue.5" : 'gray.2'}>
-        <Text fontFamily="heading" fontSize="ss" color="white">
-          {isNew ? "Novo" : "Usado"}
-        </Text>
-      </Box>
+          <Box
+            mt={6}
+            h={4}
+            w={12}
+            alignItems="center"
+            rounded="full"
+            bg={isNew ? "blue.5" : "gray.2"}
+          >
+            <Text fontFamily="heading" fontSize="ss" color="white">
+              {isNew ? "Novo" : "Usado"}
+            </Text>
+          </Box>
 
-      <HStack mt={2} alignItems="center" justifyContent="space-between">
-        <Heading fontFamily="heading" fontSize="lg" color="gray.1">
-          {title}
-        </Heading>
-        <HStack alignItems="center">
-          <Heading mr={1} fontFamily="heading" fontSize="sm" color="blue.5">
-            R${""}
-          </Heading>
-          <Heading fontFamily="heading" fontSize="lg" color="blue.5">
-            {price}
-          </Heading>
-        </HStack>
-      </HStack>
+          <HStack mt={2} alignItems="center" justifyContent="space-between">
+            <Heading fontFamily="heading" fontSize="lg" color="gray.1">
+              {title}
+            </Heading>
+            <HStack alignItems="center">
+              <Heading mr={1} fontFamily="heading" fontSize="sm" color="blue.5">
+                R${""}
+              </Heading>
+              <Heading fontFamily="heading" fontSize="lg" color="blue.5">
+                {price}
+              </Heading>
+            </HStack>
+          </HStack>
 
-      <Text mt={2} color="gray.2" fontFamily="body" fontSize="sm">
-        {description}
-      </Text>
+          <Text mt={2} color="gray.2" fontFamily="body" fontSize="sm">
+            {description}
+          </Text>
 
-      <HStack my={4} alignItems="center">
-        <Heading fontSize="sm" fontFamily="heading" color="gray.2">
-          Aceita troca?{" "}
-        </Heading>
-        <Text ml={2} fontSize="sm" fontFamily="body">
-          {isTraded ? "Sim" : "Não"}
-        </Text>
-      </HStack>
+          <HStack my={4} alignItems="center">
+            <Heading fontSize="sm" fontFamily="heading" color="gray.2">
+              Aceita troca?{" "}
+            </Heading>
+            <Text ml={2} fontSize="sm" fontFamily="body">
+              {isTraded ? "Sim" : "Não"}
+            </Text>
+          </HStack>
 
-      {generatePaymentMethods(paymentMethods, '#1A181B')}
-      </VStack>
+          {generatePaymentMethods(paymentMethods, "#1A181B")}
+        </VStack>
 
         <HStack
           bg="gray.7"

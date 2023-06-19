@@ -15,7 +15,6 @@ import { AppError } from "@utils/AppError";
 import { ProductDTO } from "../dtos/ProductDTO";
 import { ProductDetails } from "@components/ProductDetails";
 import { useAuth } from "@hooks/useAuth";
-import { Carrossel } from "@components/Carrossel";
 
 type RouteParams = {
   id: string;
@@ -181,8 +180,6 @@ export const MyAdDetails = (): ReactElement => {
               onPress={handleGoBack}
             />
           </HStack>
-
-          <Carrossel productImgs={product.product_images}/>
           
           <ProductDetails
             id={id}
@@ -191,7 +188,7 @@ export const MyAdDetails = (): ReactElement => {
             price={price}
             isNew={isNew}
             acceptTrade={isTraded}
-            productImgs={productImgs}
+            productImgs={product.product_images}
             paymentMethods={paymentMethods}
             isActive={isActive}
             profileImage={`${api.defaults.baseURL}/images/${user.avatar}`}

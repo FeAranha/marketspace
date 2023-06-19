@@ -2,6 +2,9 @@ import { HStack, Image, Text, Heading, Box, VStack } from "native-base";
 import { Bank, Barcode, QrCode, Tag } from "phosphor-react-native";
 import { useAuth } from "@hooks/useAuth";
 import { generatePaymentMethods } from "@utils/generatePaymentMethods";
+import { Dimensions } from "react-native";
+import Carousel from "react-native-reanimated-carousel";
+import { api } from "@services/api";
 
 type Props = {
   variant?: "adActive" | "adInactive";
@@ -11,7 +14,7 @@ type Props = {
   price: string;
   isNew: boolean;
   acceptTrade: boolean;
-  productImgs?: any[];
+  productImgs: any[];
   paymentMethods?: any[];
   
   isActive?: boolean;
@@ -36,9 +39,35 @@ export function ProductDetails({
  
 }: Props) {
   const { user } = useAuth();
+  const width = Dimensions.get("window").width;
 
   return (
     <VStack m={6}>
+      
+      <Carousel
+      loop
+      width={width}
+      height={320}
+      autoPlay={productImgs.length > 1}
+      data={productImgs}
+      scrollAnimationDuration={1000}
+      renderItem={({ item }) => (
+        <Image
+          w="full"
+          h={80}
+          source={{
+            uri: item.uri
+              ? item.uri
+              : `${api.defaults.baseURL}/images/${item.path}`,
+          }}
+          alt="Ad Image"
+          resizeMode="cover"
+          borderColor="gray.400"
+          borderWidth={1}
+        />
+      )}
+    />
+
       <HStack>
         <Image mr={2} source={{uri: profileImage }} alt="avatar" size={6} />
         <Text fontFamily="body" fontSize="sm">
