@@ -7,7 +7,6 @@ type Props = TouchableOpacityProps & {
   id: string;
   title: string;
   description?: string;
-  productImgs?: any[];
   price: string;
   isNew: boolean;
   isTraded?: boolean;
@@ -16,14 +15,13 @@ type Props = TouchableOpacityProps & {
   image: string;
 
   showProfile?: boolean;
-  profileImage?: any;
+  profileImage: string;
 };
 
 export function ProductCard({
   id,
   title,
   description,
-  productImgs,
   price,
   paymentMethods,
   isNew = false,
@@ -44,7 +42,6 @@ export function ProductCard({
         id,
         title,
         description,
-        productImgs,
         price,
         paymentMethods,
         isNew,

@@ -37,7 +37,7 @@ type AppRoutes = {
     id: string;
     title: string;
     description?: string;
-    productImgs: any[];
+    productImgs?: any[];
     price: string;
     paymentMethods?: string[];
     isNew: boolean;

@@ -10,17 +10,19 @@ import {
   useToast,
   VStack,
 } from "native-base";
-import { WhatsappLogo } from "phosphor-react-native";
+import { User, WhatsappLogo } from "phosphor-react-native";
 import { AntDesign } from "@expo/vector-icons";
 import bicicletaImg from "@assets/bicicleta.png";
 import { ReactElement, useEffect, useState } from "react";
 import { Button } from "@components/Button";
 import { ProductDetails } from "@components/ProductDetails";
-import { ProductDTO } from "../dtos/ProductDTO";
+import { ProductDTO } from "@dtos/ProductDTO";
+import { UserDTO } from "@dtos/UserDTO";
 import { api } from "@services/api";
 import { useAuth } from "@hooks/useAuth";
 import { AppError } from "@utils/AppError";
 import { Loading } from "@components/Loading";
+import { string } from "yup";
 
 type RouteParams = {
   id: string;
@@ -53,7 +55,7 @@ export const AdDetails = (): ReactElement => {
   } = route.params as RouteParams;
 
   const [product, setProduct] = useState({} as ProductDTO);
-
+  const [ownerAd, setOwnerAd] = useState<string>('')
   const [isLoading, setIsLoading] = useState(true);
 
   function handleGoBack() {
@@ -67,8 +69,9 @@ export const AdDetails = (): ReactElement => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const productData = await api.get(`products/${id}`);
-        setProduct(productData.data);
+        const productData = await api.get(`products/${id}`)
+        setProduct(productData.data)
+        setOwnerAd(productData.data.user.name)
         setIsLoading(false);
       } catch (error) {
         const isAppError = error instanceof AppError;
@@ -115,6 +118,8 @@ export const AdDetails = (): ReactElement => {
           </HStack>
 
           <ProductDetails
+            AdOwner={ownerAd}
+            profileImage={`${api.defaults.baseURL}/images/${product.user?.avatar}`}
             id={product.id}
             title={product.name}
             description={product.description}
@@ -124,7 +129,7 @@ export const AdDetails = (): ReactElement => {
             productImgs={product.product_images}
             paymentMethods={product.payment_methods}
             isActive={product.is_active}
-            profileImage={`${api.defaults.baseURL}/images/${user.avatar}`}
+           
           />
 
           <HStack

@@ -8,7 +8,8 @@ import { api } from "@services/api";
 
 type Props = {
   variant?: "adActive" | "adInactive";
-  id?: string;
+  id: string;
+  AdOwner: string;
   title: string;
   description: string;
   price: string;
@@ -19,12 +20,13 @@ type Props = {
   
   isActive?: boolean;
   showProfile?: boolean;
-  profileImage?: string;
+  profileImage: string;
 };
 
 export function ProductDetails({
   variant,
   id,
+  AdOwner,
   title,
   description,
   price,
@@ -32,7 +34,6 @@ export function ProductDetails({
   acceptTrade,
   productImgs,
   paymentMethods,
-
   isActive = true,
   profileImage,
   showProfile = false,
@@ -73,7 +74,7 @@ export function ProductDetails({
       <HStack>
         <Image mr={2} source={{uri: profileImage }} alt="avatar" size={6} />
         <Text fontFamily="body" fontSize="sm">
-          {user.name}
+          {AdOwner}
         </Text>
       </HStack>
 

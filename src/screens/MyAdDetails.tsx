@@ -183,6 +183,7 @@ export const MyAdDetails = (): ReactElement => {
           
           <ProductDetails
             id={id}
+            AdOwner={user.name}
             title={title} 
             description={description}
             price={price}

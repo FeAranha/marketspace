@@ -36,7 +36,7 @@ export function Home() {
   const [isTraded, setisTraded] = useState(false);
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const [isNew, setisNew] = useState(true);
-  const [products, setProducts] = useState<ProductDTO[]>([]);
+  const [product, setProduct] = useState<ProductDTO[]>([]);
   const [numberOfAds, setNumberOfAds] = useState(0);
 
   const toast = useToast();
@@ -60,7 +60,7 @@ export function Home() {
           const productsData = await api.get("/users/products");
           const generalProductsData = await api.get("/products");
 
-          setProducts(generalProductsData.data);
+          setProduct(generalProductsData.data);
           setNumberOfAds(productsData.data.length);
         } catch (error) {
           const isAppError = error instanceof AppError;
@@ -339,7 +339,7 @@ export function Home() {
             />
 
             <FlatList
-              data={products}
+              data={product}
               numColumns={2}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
