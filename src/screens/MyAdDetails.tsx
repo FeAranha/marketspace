@@ -1,14 +1,8 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
-import {
-  HStack,
-  Icon,
-  Stack,
-  useToast,
-  ScrollView,
-} from "native-base";
+import { HStack, Icon, Stack, useToast, ScrollView } from "native-base";
 import { AntDesign } from "@expo/vector-icons";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import { Loading } from "@components/Loading";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
@@ -37,7 +31,7 @@ export const MyAdDetails = (): ReactElement => {
   const route = useRoute();
   const toast = useToast();
 
-  const { 
+  const {
     id,
     title,
     description,
@@ -48,12 +42,12 @@ export const MyAdDetails = (): ReactElement => {
     isTraded,
     isActive,
   } = route.params as RouteParams;
-  
+
   const [product, setProduct] = useState({} as ProductDTO);
 
-  function handleGoBack() {
+  const handleGoBack = useCallback(() => {
     navigation.navigate("myads");
-  }
+  }, [navigation]);
 
   const handleGoEditAd = () => {
     // navigation.navigate("createAD", {
@@ -68,7 +62,7 @@ export const MyAdDetails = (): ReactElement => {
     // });
   };
 
-  const handleChangeActive = async () => {
+  const handleChangeActive = useCallback(async () => {
     try {
       setAdActive(true);
       const data = await api.patch(`products/${id}`, {
@@ -97,9 +91,9 @@ export const MyAdDetails = (): ReactElement => {
     } finally {
       setAdActive(false);
     }
-  };
+  }, [id, product.is_active]);
 
-  const handleDeleteAd = async () => {
+  const handleDeleteAd = useCallback(async () => {
     try {
       setIsDeletingLoading(true);
       await api.delete(`products/${id}`);
@@ -119,7 +113,7 @@ export const MyAdDetails = (): ReactElement => {
         });
       }
     }
-  };
+  }, [id, navigation]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -180,20 +174,21 @@ export const MyAdDetails = (): ReactElement => {
               onPress={handleGoBack}
             />
           </HStack>
-          
-          <ProductDetails
-            id={id}
-            AdOwner={user.name}
-            title={title} 
-            description={description}
-            price={price}
-            isNew={isNew}
-            acceptTrade={isTraded}
-            productImgs={product.product_images}
-            paymentMethods={paymentMethods}
-            isActive={isActive}
-            profileImage={`${api.defaults.baseURL}/images/${user.avatar}`}
-          />
+          {product && (
+            <ProductDetails
+              id={id}
+              AdOwner={user.name}
+              title={title}
+              description={description}
+              price={price}
+              isNew={isNew}
+              acceptTrade={isTraded}
+              productImgs={product.product_images}
+              paymentMethods={product.payment_methods.map((item) => item.key)}
+              isActive={isActive}
+              profileImage={`${api.defaults.baseURL}/images/${user.avatar}`}
+            />
+          )}
         </Stack>
       )}
     </ScrollView>

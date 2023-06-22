@@ -119,8 +119,9 @@ export const PreviewAD = (): ReactElement => {
       setIsLoading(false);
     }
   }
-  const width = Dimensions.get("window").width;
 
+  const width = Dimensions.get("window").width;
+  console.log('paymentMethods => ', paymentMethods)
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}

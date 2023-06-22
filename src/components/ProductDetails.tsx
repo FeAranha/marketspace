@@ -16,7 +16,7 @@ type Props = {
   isNew: boolean;
   acceptTrade: boolean;
   productImgs: any[];
-  paymentMethods: any[];
+  paymentMethods: string[];
   
   isActive?: boolean;
   showProfile?: boolean;
@@ -118,7 +118,7 @@ export function ProductDetails({
         </Text>
       </HStack>
       
-       {/* {generatePaymentMethods(paymentMethods, '#1A181B')}  */}
+        {generatePaymentMethods(paymentMethods, '#1A181B')}  
       
     </VStack>
   );
