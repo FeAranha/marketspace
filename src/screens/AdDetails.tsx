@@ -7,6 +7,9 @@ import {
   ScrollView,
   useToast,
   VStack,
+  Modal,
+  Input,
+  KeyboardAvoidingView,
 } from "native-base";
 import { WhatsappLogo } from "phosphor-react-native";
 import { AntDesign } from "@expo/vector-icons";
@@ -18,6 +21,7 @@ import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
 import { Loading } from "@components/Loading";
 import React from "react";
+import { Linking, Platform, TextInput } from "react-native";
 
 type RouteParams = {
   id: string;
@@ -41,14 +45,34 @@ export const AdDetails = (): ReactElement => {
   const [product, setProduct] = useState({} as ProductDTO);
   const [ownerAd, setOwnerAd] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingDetails, setIsLoadingDetails] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [messageWpp, setMessageWpp] = useState("");
+  const [inputHeight, setInputHeight] = useState(40); 
 
   function handleGoBack() {
     navigation.goBack();
   }
 
+  function handleInputChange(text: string) {
+    setMessageWpp(text);
+  }
+
   function goWhats() {
-    //TODO function goWhats
+    const phoneNumber = product.user?.tel;
+
+    if (phoneNumber) {
+      const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+        messageWpp
+      )}`;
+      Linking.openURL(url);
+    } else {
+      toast.show({
+        title: "Contato não disponível",
+        placement: "top",
+        bgColor: "red.500",
+      });
+    }
+    setIsModalOpen(false);
   }
 
   useEffect(() => {
@@ -72,13 +96,12 @@ export const AdDetails = (): ReactElement => {
         }
       } finally {
         setIsLoading(false);
-        setIsLoadingDetails(false)
       }
     };
     loadData();
   }, [id]);
 
-  if (isLoading || isLoadingDetails) {
+  if (isLoading) {
     return <Loading />;
   }
 
@@ -138,7 +161,7 @@ export const AdDetails = (): ReactElement => {
             <Heading mr={1} fontFamily="heading" fontSize="sm" color="blue.7">
               R$
             </Heading>
-            {/* API product price */}
+
             <Heading fontFamily="heading" fontSize="xl" color="blue.7">
               {product.price}
             </Heading>
@@ -152,10 +175,62 @@ export const AdDetails = (): ReactElement => {
             }
             mt={2}
             title="Entrar em contato"
-            onPress={goWhats}
+            onPress={() => setIsModalOpen(true)}
           />
-          {/* TODO 📞 goWhats */}
         </HStack>
+
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+          flex={1}
+        >
+          <Modal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            avoidKeyboard={false}
+            justifyContent="flex-start"
+            top="8"
+            size="full"
+          >
+            <Modal.Content pt={4}>
+              <HStack alignItems="center">
+                <Modal.CloseButton color="gray.4" />
+                <Modal.Header borderBottomWidth={0}>
+                  <Heading color="gray.1" fontFamily="heading" fontSize="lg">
+                    Escreva algo para o anunciante:
+                  </Heading>
+                </Modal.Header>
+              </HStack>
+
+              <Modal.Body alignItems="center">
+                <Input
+                  value={messageWpp}
+                  onChangeText={handleInputChange}
+                  placeholder="Digite sua mensagem"
+                  borderWidth={1}
+                  borderColor="gray"
+                  borderRadius={4}
+                  p={2}
+                  width="100%"
+                  minHeight={inputHeight}
+                  flexGrow={1}
+                  multiline
+                  textAlignVertical="top"
+                  onContentSizeChange={
+                    (event) =>
+                      setInputHeight(event.nativeEvent.contentSize.height)
+                  }
+                />
+                <Button
+                  mx={6}
+                  my={12}
+                  onPress={goWhats}
+                  title={"Enviar mensagem"}
+                />
+              </Modal.Body>
+            </Modal.Content>
+          </Modal>
+        </KeyboardAvoidingView>
       </VStack>
     </ScrollView>
   );

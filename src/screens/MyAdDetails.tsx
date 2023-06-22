@@ -151,7 +151,7 @@ export const MyAdDetails = (): ReactElement => {
           <HStack
             h={25}
             px={6}
-            pb={4}
+            pb={8}
             pt={12}
             alignItems="center"
             justifyContent="space-between"
