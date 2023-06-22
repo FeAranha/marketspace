@@ -1,6 +1,14 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
-import { HStack, Icon, Stack, useToast, ScrollView } from "native-base";
+import {
+  HStack,
+  Icon,
+  Stack,
+  useToast,
+  ScrollView,
+  Text,
+  Heading,
+} from "native-base";
 import { AntDesign } from "@expo/vector-icons";
 import { ReactElement, useCallback, useEffect, useState } from "react";
 import { Loading } from "@components/Loading";
@@ -9,6 +17,8 @@ import { AppError } from "@utils/AppError";
 import { ProductDTO } from "../dtos/ProductDTO";
 import { ProductDetails } from "@components/ProductDetails";
 import { useAuth } from "@hooks/useAuth";
+import { Button } from "@components/Button";
+import { Power } from "phosphor-react-native";
 
 type RouteParams = {
   id: string;
@@ -75,11 +85,18 @@ export const MyAdDetails = (): ReactElement => {
           is_active: !state.is_active,
         };
       });
+      toast.show({
+        title: `Anúncio ${
+          product.is_active ? "desativado" : "ativado"
+        } com sucesso!`,
+        placement: "top",
+        bgColor: "green.500",
+      });
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
         ? error.message
-        : "Não foi possível deletar. Tente Novamente!";
+        : "Não foi possível atualizar o status do anúncio. Tente novamente mais tarde";
 
       if (isAppError) {
         toast.show({
@@ -174,6 +191,28 @@ export const MyAdDetails = (): ReactElement => {
               onPress={handleGoBack}
             />
           </HStack>
+          {!product.is_active && (
+            <Heading
+              bg="gray.3"
+              flex={1}
+              textTransform="uppercase"
+              color="white"
+              fontSize="lg"
+              position="absolute"
+              zIndex={100}
+              fontWeight="bold"
+              textAlign="center"
+              p={1}
+              w={240}
+              borderRadius={10}
+              top="30%"
+              left="20%"
+              
+            >
+              ANÚNCIO DESATIVADO
+            </Heading>
+          )}
+
           {product && (
             <ProductDetails
               id={id}
@@ -185,10 +224,26 @@ export const MyAdDetails = (): ReactElement => {
               acceptTrade={isTraded}
               productImgs={product.product_images}
               paymentMethods={product.payment_methods.map((item) => item.key)}
-              isActive={isActive}
+              isActive={product.is_active}
               profileImage={`${api.defaults.baseURL}/images/${user.avatar}`}
             />
           )}
+          <HStack mx={6}>
+            <Button
+              w="full"
+              bgColor={product.is_active ? "gray.1" : "#647AC7"}
+              startIcon={
+                <Icon
+                  as={<Power size={20} color="#EDECEE" weight="regular" />}
+                />
+              }
+              mt={2}
+              title={
+                product.is_active ? "Desativar anúncio" : "Reativar anúncio"
+              }
+              onPress={handleChangeActive}
+            />
+          </HStack>
         </Stack>
       )}
     </ScrollView>

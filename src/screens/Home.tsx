@@ -59,9 +59,9 @@ export function Home() {
         try {
           const productsData = await api.get("/users/products");
           const generalProductsData = await api.get("/products");
-
+          const activeProducts = productsData.data.filter((product) => product.is_active);
           setProduct(generalProductsData.data);
-          setNumberOfAds(productsData.data.length);
+          setNumberOfAds(activeProducts.length);
         } catch (error) {
           const isAppError = error instanceof AppError;
           const title = isAppError

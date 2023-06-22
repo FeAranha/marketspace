@@ -139,14 +139,13 @@ export function MyADs() {
                   <ProductCard
                     id={item.id}
                     image={`${api.defaults.baseURL}/images/${item.product_images[0].path}`}
+                    isActive={item.is_active}
                     price={item.price
                       .toFixed(2)
                       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
                     isNew={item.is_new}
                     title={item.name}
-                    //isActive={false}
-                    //profileImage={`${api.defaults.baseURL}/images/${item.user?.avatar}`}
-                    //showProfile //: em home adicionar esta prop para exibir a foto do dono do produto
+                    profileImage={`${api.defaults.baseURL}/images/${item.user?.avatar}`}
                   />
                 </HStack>
               )}

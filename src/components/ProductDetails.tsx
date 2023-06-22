@@ -53,6 +53,7 @@ export function ProductDetails({
           scrollAnimationDuration={1000}
           renderItem={({ item }) => (
             <Image
+              blurRadius={isActive ? 0 : 10}
               w="full"
               h={80}
               source={{

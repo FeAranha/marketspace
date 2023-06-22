@@ -100,6 +100,7 @@ export function ProductCard({
               bg="gray.3"
               p={1}
               borderRadius={10}
+              left='20%'
             >
               Anúncio Desativado
             </Heading>
