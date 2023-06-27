@@ -20,17 +20,7 @@ import { useAuth } from "@hooks/useAuth";
 import { Button } from "@components/Button";
 import { Power } from "phosphor-react-native";
 
-type RouteParams = {
-  id: string;
-  title: string;
-  description: string;
-  productImgs: any[];
-  price: string;
-  paymentMethods: string[];
-  isNew: boolean;
-  acceptTrade: boolean;
-  isActive: boolean;
-};
+type RouteParams = { id: string};
 
 export const MyAdDetails = (): ReactElement => {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
@@ -41,17 +31,7 @@ export const MyAdDetails = (): ReactElement => {
   const route = useRoute();
   const toast = useToast();
 
-  const {
-    id,
-    title,
-    description,
-    productImgs,
-    price,
-    paymentMethods,
-    isNew,
-    acceptTrade,
-    isActive,
-  } = route.params as RouteParams;
+  const { id } = route.params as RouteParams;
 
   const [product, setProduct] = useState({} as ProductDTO);
 
@@ -215,13 +195,13 @@ export const MyAdDetails = (): ReactElement => {
 
           {product && (
             <ProductDetails
-              id={id}
+              id={product.id}
               AdOwner={user.name}
-              title={title}
-              description={description}
-              price={price}
-              isNew={isNew}
-              acceptTrade={acceptTrade}
+              title={product.name}
+              description={product.description}
+              price={product.price.toString()}
+              isNew={product.is_new}
+              acceptTrade={product.is_traded}
               productImgs={product.product_images}
               paymentMethods={product.payment_methods.map((item) => item.key)}
               isActive={product.is_active}

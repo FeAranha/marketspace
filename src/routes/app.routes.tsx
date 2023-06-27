@@ -37,23 +37,23 @@ type AppRoutes = {
   };
   myaddetails: {
     id: string;
-    title: string;
-    description: string;
-    images: any[];
-    price: string;
-    paymentMethods: string[];
-    isNew: boolean;
-    acceptTrade: boolean;
+    title?: string;
+    description?: string;
+    images?: any[];
+    price?: string;
+    paymentMethods?: string[];
+    isNew?: boolean;
+    acceptTrade?: boolean;
     isActive?: boolean;
   };
   editad: {
-    title: string;
-    description: string;
-    price: string;
-    images: any[];
-    paymentMethods: string[];
-    isNew: boolean;
-    acceptTrade: boolean;
+    title?: string;
+    description?: string;
+    price?: string;
+    images?: any[];
+    paymentMethods?: string[];
+    isNew?: boolean;
+    acceptTrade?: boolean;
     id: string;
   };
 };

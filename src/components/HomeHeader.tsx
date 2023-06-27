@@ -1,5 +1,4 @@
 import { Heading, HStack, Text, VStack, Image, Icon } from "native-base";
-import AvatarImg from "@assets/avatar.png";
 import { Button } from "./Button";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";

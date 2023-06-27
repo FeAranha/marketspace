@@ -6,7 +6,7 @@ import { AppNavigatorRoutesProps } from "@routes/app.routes";
 type Props = TouchableOpacityProps & {
   id: string;
   title: string;
-  description?: string;
+  description: string;
   price: string;
   isNew: boolean;
   acceptTrade: boolean;

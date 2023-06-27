@@ -23,6 +23,7 @@ import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { generatePaymentMethods } from "@utils/generatePaymentMethods";
 import { Dimensions } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
+import { ProductDTO } from "@dtos/ProductDTO";
 
 type RouteParams = {
   id?: string;
@@ -57,16 +58,21 @@ export const PreviewAD = (): ReactElement => {
     isActive,
   } = route.params as RouteParams;
 
-  function handleGoBack() {
-    navigation.goBack();
-  }
+  const [product, setProduct] = useState({} as ProductDTO);
+
+  const handleGoEditAd = () => {
+    if (typeof id === "string") {
+      navigation.navigate("editad", {
+        id: id,
+      });
+    }
+  };
 
   async function handlePublish() {
     setIsLoading(true);
     try {
       let product;
       if (id) {
-        console.log('id', id )
         product = await api.put(`products/${id}`, {
           name: title,
           description,
@@ -74,10 +80,22 @@ export const PreviewAD = (): ReactElement => {
           payment_methods: paymentMethods,
           is_new: isNew,
           accept_trade: acceptTrade,
-          user: { connect: { id: user.id }},
+          user: { connect: { id: user.id } },
+        });
+
+        navigation.navigate("myaddetails", {
+          id: id,
+          title: title,
+          description: description,
+          images: images,
+          price: price,
+          paymentMethods: paymentMethods,
+          isNew: isNew,
+          acceptTrade: acceptTrade,
+          isActive: isActive,
         });
       } else {
-          product = await api.post("/products", {
+        product = await api.post("/products", {
           name: title,
           description,
           price: parseInt(price.replace(/[^0-9]/g, "")),
@@ -117,7 +135,6 @@ export const PreviewAD = (): ReactElement => {
         images,
         title,
       });
-
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
@@ -132,13 +149,12 @@ export const PreviewAD = (): ReactElement => {
         });
       }
     } finally {
-      console.log('id', id )
       setIsLoading(false);
     }
   }
 
   const width = Dimensions.get("window").width;
-  console.log('id', id )
+
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
@@ -254,7 +270,7 @@ export const PreviewAD = (): ReactElement => {
             w={40}
             title="Voltar e editar"
             variant="solid"
-            onPress={handleGoBack}
+            onPress={handleGoEditAd}
           />
 
           <Button
@@ -269,3 +285,5 @@ export const PreviewAD = (): ReactElement => {
     </ScrollView>
   );
 };
+
+export default PreviewAD;

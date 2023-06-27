@@ -107,7 +107,7 @@ export const EditAd = () => {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   const handleGoBack = () => {
-    navigation.navigate("addetails", { id });
+    navigation.navigate("myaddetails", { id });
   };
 
   const handleGoPreview = ({ title, description, price }: FormDataProps) => {
@@ -177,9 +177,7 @@ export const EditAd = () => {
           type: `${photoSelected.assets[0].type}/${fileExtension}`,
         } as any;
 
-        setImages((images) => {
-          return [...images, photoFile];
-        });
+        setImages((prevImages) => [...prevImages, photoFile]);
 
         toast.show({
           title: "Foto selecionada!",
@@ -211,7 +209,7 @@ export const EditAd = () => {
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
       >
-        <ScreenHeader title="Editar Anúncio" variant="edit"/>
+        <ScreenHeader title="Editar Anúncio" variant="goback" />
 
         <VStack p={5} flex={1} alignItems="flex-start">
           <Heading color="gray.2" fontSize={18}>
@@ -223,21 +221,20 @@ export const EditAd = () => {
           </Text>
 
           <HStack my={5}>
-            {images.length > 0 &&
-              images.map((imageData) => (
-                <Image
-                  w={88}
-                  h={88}
-                  mr={2}
-                  source={{
-                    uri: `${api.defaults.baseURL}/images/${imageData.path}`,
-                  }}
-                  alt="Imagem do novo anúncio"
-                  resizeMode="cover"
-                  borderRadius={8}
-                  key={`${api.defaults.baseURL}/images/${imageData.path}`}
-                />
-              ))}
+            {images.map((imageData, index) => (
+              <Image
+                key={index}
+                w={88}
+                h={88}
+                mr={2}
+                source={{
+                  uri: `${api.defaults.baseURL}/images/${imageData.path}`,
+                }}
+                alt="Imagem do novo AD"
+                resizeMode="cover"
+                borderRadius={8}
+              />
+            ))}
 
             {images.length < 3 && (
               <NativeButton
