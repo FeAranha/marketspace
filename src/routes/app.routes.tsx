@@ -4,6 +4,7 @@ import {
 } from "@react-navigation/bottom-tabs";
 import { Home } from "@screens/Home";
 import { MyADs } from "@screens/MyADs";
+import { EditAd } from "@screens/EditAd";
 import { Logoff } from "@screens/Logoff";
 import { CreateAD } from "@screens/CreateAD";
 import { PreviewAD } from "@screens/PreviewAD";
@@ -23,26 +24,36 @@ type AppRoutes = {
   previewad: {
     title: string;
     description: string;
-    productImgs: any[];
+    images: any[];
     price: string;
     paymentMethods: string[];
     isNew: boolean;
-    isTraded: boolean;
+    acceptTrade: boolean;
     isActive?: boolean;
   };
   addetails: {
     id: string;
-  }
+  };
   myaddetails: {
     id: string;
     title: string;
     description?: string;
-    productImgs?: any[];
+    images?: any[];
     price: string;
     paymentMethods: string[];
     isNew: boolean;
-    isTraded?: boolean;
+    acceptTrade: boolean;
     isActive?: boolean;
+  };
+  editad: {
+    title: string;
+    description: string;
+    price: string;
+    images: any[];
+    paymentMethods: string[];
+    isNew: boolean;
+    acceptTrade: boolean;
+    id: string;
   };
 };
 
@@ -111,6 +122,11 @@ export function AppRoutes() {
         name="myaddetails"
         component={MyAdDetails}
         options={{ tabBarButton: () => null }}
+      />
+      <Screen
+        name="editad"
+        component={EditAd}
+        options={{ tabBarButton: () => null}}
       />
       <Screen
         name="addetails"

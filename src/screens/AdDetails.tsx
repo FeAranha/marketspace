@@ -31,7 +31,7 @@ type RouteParams = {
   price: string;
   paymentMethods: string[];
   isNew: boolean;
-  isTraded: boolean;
+  acceptTrade: boolean;
   isActive: boolean;
 };
 

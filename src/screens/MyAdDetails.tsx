@@ -28,7 +28,7 @@ type RouteParams = {
   price: string;
   paymentMethods: string[];
   isNew: boolean;
-  isTraded: boolean;
+  acceptTrade: boolean;
   isActive: boolean;
 };
 
@@ -49,7 +49,7 @@ export const MyAdDetails = (): ReactElement => {
     price,
     paymentMethods,
     isNew,
-    isTraded,
+    acceptTrade,
     isActive,
   } = route.params as RouteParams;
 
@@ -60,16 +60,16 @@ export const MyAdDetails = (): ReactElement => {
   }, [navigation]);
 
   const handleGoEditAd = () => {
-    // navigation.navigate("createAD", {
-    //   title: product.name,
-    //   description: product.description,
-    //   price: product.price.toString(),
-    //   images: product.product_images,
-    //   paymentMethods: product.payment_methods.map((item) => item.key),
-    //   isNew: product.is_new,
-    //   acceptTrade: product.accept_trade,
-    //   id: product.id,
-    // });
+     navigation.navigate("editad", {
+       title: product.name,
+       description: product.description,
+       price: product.price.toString(),
+       images: product.product_images,
+       paymentMethods: product.payment_methods.map((item) => item.key),
+       isNew: product.is_new,
+       acceptTrade: product.is_traded,
+       id: product.id,
+     });
   };
 
   const handleChangeActive = useCallback(async () => {
@@ -188,7 +188,7 @@ export const MyAdDetails = (): ReactElement => {
               name="edit"
               color="gray.1"
               size={6}
-              onPress={handleGoBack}
+              onPress={handleGoEditAd}
             />
           </HStack>
           {!product.is_active && (
@@ -221,7 +221,7 @@ export const MyAdDetails = (): ReactElement => {
               description={description}
               price={price}
               isNew={isNew}
-              acceptTrade={isTraded}
+              acceptTrade={acceptTrade}
               productImgs={product.product_images}
               paymentMethods={product.payment_methods.map((item) => item.key)}
               isActive={product.is_active}

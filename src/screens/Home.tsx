@@ -33,7 +33,7 @@ export function Home() {
   const [searchAd, setSearchAd] = useState("");
   const [groupValues, setGroupValues] = useState([]);
   const [modalVisible, setModalVisible] = React.useState(false);
-  const [isTraded, setisTraded] = useState(false);
+  const [acceptTrade, setAcceptTrade] = useState(false);
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const [isNew, setisNew] = useState(true);
   const [product, setProduct] = useState<ProductDTO[]>([]);
@@ -239,7 +239,7 @@ export function Home() {
                   <Switch
                     mt={-2}
                     size="lg"
-                    onChange={() => setisTraded(!isTraded)}
+                    onChange={() => setAcceptTrade(!acceptTrade)}
                   />
                   {/* ⚛ Meios Pag */}
                   <Heading
@@ -293,7 +293,7 @@ export function Home() {
                         "Novo:",
                         isNew,
                         ", Trocavél:",
-                        isTraded,
+                        acceptTrade,
                         ", Meios de pagamentos: ",
                         groupValues,
                         "Buscar anúncio por: ",

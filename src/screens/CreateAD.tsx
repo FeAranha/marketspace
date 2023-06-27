@@ -56,8 +56,8 @@ type FormDataProps = {
 export function CreateAD() {
   const [isNew, setIsNew] = useState(false);
   const [paymentMethods, setPaymentMethods] = useState<string[]>([]);
-  const [isTraded, setisTraded] = useState(false);
-  const [productImgs, setProductImg] = useState<any[]>([]);
+  const [acceptTrade, setAcceptTrade] = useState(false);
+  const [images, setImages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
@@ -94,7 +94,7 @@ export function CreateAD() {
         return;
       }
 
-      if (productImgs.length > 2) {
+      if (images.length > 2) {
         throw new AppError("Só pode selecionar 3 fotos!");
       }
 
@@ -118,8 +118,8 @@ export function CreateAD() {
           type: `${imgSelected.assets[0].type}/${fileExtension}`,
         } as any;
 
-        setProductImg((productImgs) => {
-          return [...productImgs, imgFile];
+        setImages((images) => {
+          return [...images, imgFile];
         });
 
         toast.show({
@@ -151,7 +151,7 @@ export function CreateAD() {
   }
 
   function handlePreviewAD({ title, description, price }: FormDataProps) {
-    if (productImgs.length === 0) {
+    if (images.length === 0) {
       return toast.show({
         title: "Selecione ao menos uma imagem!",
         placement: "top",
@@ -170,11 +170,11 @@ export function CreateAD() {
     navigation.navigate("previewad", {
       title,
       description,
-      productImgs,
+      images,
       price,
       paymentMethods,
       isNew,
-      isTraded,
+      acceptTrade,
     });
   }
 
@@ -206,8 +206,8 @@ export function CreateAD() {
         </Text>
 
         <HStack>
-          {productImgs.length > 0 &&
-            productImgs.map((imageData) => (
+          {images.length > 0 &&
+            images.map((imageData) => (
               <Image
                 w={88}
                 h={88}
@@ -221,7 +221,7 @@ export function CreateAD() {
                 key={imageData.uri}
               />
             ))}
-          {productImgs.length < 3 && (
+          {images.length < 3 && (
             <NativeButton
               bg="gray.500"
               w={88}
@@ -348,8 +348,8 @@ export function CreateAD() {
           <Switch
             m={0}
             size="lg"
-            onToggle={(value) => setisTraded(value)}
-            value={isTraded}
+            onToggle={(value) => setAcceptTrade(value)}
+            value={acceptTrade}
           />
         </VStack>
 

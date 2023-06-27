@@ -25,13 +25,14 @@ import { Dimensions } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 
 type RouteParams = {
+  id?: string;
   title: string;
   description: string;
   price: string;
-  productImgs: any[];
+  images: any[];
   paymentMethods: string[];
   isNew: boolean;
-  isTraded: boolean;
+  acceptTrade: boolean;
   isActive?: boolean;
 };
 
@@ -45,13 +46,14 @@ export const PreviewAD = (): ReactElement => {
 
   const route = useRoute();
   const {
+    id,
     title,
     description,
     price,
-    productImgs,
+    images,
     paymentMethods,
     isNew,
-    isTraded,
+    acceptTrade,
     isActive,
   } = route.params as RouteParams;
 
@@ -61,20 +63,33 @@ export const PreviewAD = (): ReactElement => {
 
   async function handlePublish() {
     setIsLoading(true);
-
     try {
-      const product = await api.post("/products", {
-        name: title,
-        description,
-        price: parseInt(price.replace(/[^0-9]/g, "")),
-        payment_methods: paymentMethods,
-        is_new: isNew,
-        accept_trade: isTraded,
-      });
+      let product;
+      if (id) {
+        product = await api.patch(`products/${id}`, {
+          name: title,
+          description,
+          price: parseInt(price.replace(/[^0-9]/g, "")),
+          payment_methods: paymentMethods,
+          is_new: isNew,
+          accept_trade: acceptTrade,
+          user_id: user.id,
+        });
+      } else {
+          product = await api.post("/products", {
+          name: title,
+          description,
+          price: parseInt(price.replace(/[^0-9]/g, "")),
+          payment_methods: paymentMethods,
+          is_new: isNew,
+          accept_trade: acceptTrade,
+          //user: user.id,
+        });
+      }
 
       const imgData = new FormData();
 
-      productImgs.forEach((item) => {
+      images.forEach((item) => {
         const imgFile = {
           ...item,
           name: user.name + "." + item.name,
@@ -96,12 +111,13 @@ export const PreviewAD = (): ReactElement => {
         description,
         isActive,
         isNew,
-        isTraded,
+        acceptTrade,
         paymentMethods,
         price,
-        productImgs,
+        images,
         title,
       });
+
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
@@ -121,7 +137,8 @@ export const PreviewAD = (): ReactElement => {
   }
 
   const width = Dimensions.get("window").width;
-  console.log('paymentMethods => ', paymentMethods)
+  console.log("productImgs => ", images);
+
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
@@ -143,8 +160,8 @@ export const PreviewAD = (): ReactElement => {
           loop
           width={width}
           height={320}
-          autoPlay={productImgs.length > 1}
-          data={productImgs}
+          autoPlay={images.length > 1}
+          data={images}
           scrollAnimationDuration={1000}
           renderItem={({ item }) => (
             <Image
@@ -214,7 +231,7 @@ export const PreviewAD = (): ReactElement => {
               Aceita troca?{" "}
             </Heading>
             <Text ml={2} fontSize="sm" fontFamily="body">
-              {isTraded ? "Sim" : "Não"}
+              {acceptTrade ? "Sim" : "Não"}
             </Text>
           </HStack>
 

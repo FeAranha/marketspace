@@ -9,11 +9,10 @@ type Props = TouchableOpacityProps & {
   description?: string;
   price: string;
   isNew: boolean;
-  isTraded?: boolean;
-  paymentMethods?: string[];
+  acceptTrade: boolean;
+  paymentMethods: string[];
   isActive?: boolean;
   image: string;
-
   showProfile?: boolean;
   profileImage: string;
 };
@@ -25,7 +24,7 @@ export function ProductCard({
   price,
   paymentMethods,
   isNew = false,
-  isTraded,
+  acceptTrade,
   isActive = true,
   image,
   profileImage,
@@ -45,7 +44,7 @@ export function ProductCard({
         price,
         paymentMethods,
         isNew,
-        isTraded,
+        acceptTrade,
         isActive,
       });
     }
