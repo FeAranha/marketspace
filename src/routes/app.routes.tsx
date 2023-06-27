@@ -22,6 +22,7 @@ type AppRoutes = {
   logoff: undefined;
   createad: undefined;
   previewad: {
+    id?: string
     title: string;
     description: string;
     images: any[];
@@ -37,8 +38,8 @@ type AppRoutes = {
   myaddetails: {
     id: string;
     title: string;
-    description?: string;
-    images?: any[];
+    description: string;
+    images: any[];
     price: string;
     paymentMethods: string[];
     isNew: boolean;

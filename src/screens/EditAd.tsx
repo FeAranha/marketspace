@@ -128,6 +128,7 @@ export const EditAd = () => {
     }
 
     navigation.navigate("previewad", {
+      id,
       title,
       description,
       price,
@@ -234,7 +235,7 @@ export const EditAd = () => {
                   alt="Imagem do novo anúncio"
                   resizeMode="cover"
                   borderRadius={8}
-                  key={imageData.path}
+                  key={`${api.defaults.baseURL}/images/${imageData.path}`}
                 />
               ))}
 

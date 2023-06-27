@@ -57,8 +57,8 @@ export const PreviewAD = (): ReactElement => {
     isActive,
   } = route.params as RouteParams;
 
-  function goCreateAD() {
-    navigation.navigate("createad");
+  function handleGoBack() {
+    navigation.goBack();
   }
 
   async function handlePublish() {
@@ -66,14 +66,15 @@ export const PreviewAD = (): ReactElement => {
     try {
       let product;
       if (id) {
-        product = await api.patch(`products/${id}`, {
+        console.log('id', id )
+        product = await api.put(`products/${id}`, {
           name: title,
           description,
           price: parseInt(price.replace(/[^0-9]/g, "")),
           payment_methods: paymentMethods,
           is_new: isNew,
           accept_trade: acceptTrade,
-          user_id: user.id,
+          user: { connect: { id: user.id }},
         });
       } else {
           product = await api.post("/products", {
@@ -83,7 +84,6 @@ export const PreviewAD = (): ReactElement => {
           payment_methods: paymentMethods,
           is_new: isNew,
           accept_trade: acceptTrade,
-          //user: user.id,
         });
       }
 
@@ -132,13 +132,13 @@ export const PreviewAD = (): ReactElement => {
         });
       }
     } finally {
+      console.log('id', id )
       setIsLoading(false);
     }
   }
 
   const width = Dimensions.get("window").width;
-  console.log("productImgs => ", images);
-
+  console.log('id', id )
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
@@ -254,7 +254,7 @@ export const PreviewAD = (): ReactElement => {
             w={40}
             title="Voltar e editar"
             variant="solid"
-            onPress={goCreateAD}
+            onPress={handleGoBack}
           />
 
           <Button
