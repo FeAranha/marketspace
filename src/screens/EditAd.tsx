@@ -10,32 +10,33 @@ import {
   Image,
   Button as NativeButton,
   useTheme,
+  Pressable,
   Radio,
   Checkbox,
   Switch,
   useToast,
+  Stack,
 } from "native-base";
 
 import { Controller, useForm } from "react-hook-form";
-
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
-
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
-
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 import { ScreenHeader } from "@components/ScreenHeader";
-
-import { Plus } from "phosphor-react-native";
-
+import { Plus, X } from "phosphor-react-native";
 import { AppError } from "@utils/AppError";
 
 import { api } from "@services/api";
+import { IProduct } from "src/interfaces/IProduct";
+import { maskedPriceToNumber, toMaskedPrice } from "@utils/Masks";
+import { IPaymentMethods } from "src/interfaces/IPaymentMethods";
+import { IPhoto } from "src/interfaces/IPhoto";
+import { useAuth } from "@hooks/useAuth";
 
 const editAdSchema = yup.object({
   title: yup
@@ -68,37 +69,20 @@ type FormDataProps = {
 
 export const EditAd = () => {
   const route = useRoute();
+  const { user } = useAuth();
+  const params = route.params as IProduct;
 
-  const {
-    title,
-    description,
-    price,
-    images: preImages,
-    paymentMethods: prePaymentMethods,
-    isNew: preIsNew,
-    acceptTrade: preAcceptTrade,
-    id,
-  } = route.params as RouteParams;
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [isNew, setIsNew] = useState<string>("");
+  const [price, setPrice] = useState("");
+  const [isActive, setIsActive] = useState(true);
+  const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
 
-  const [isNew, setIsNew] = useState<boolean>(preIsNew);
-  const [paymentMethods, setPaymentMethods] =
-    useState<string[]>(prePaymentMethods);
-  const [acceptTrade, setAcceptTrade] = useState<boolean>(preAcceptTrade);
-  const [images, setImages] = useState<any[]>(preImages);
+  const [paymentMethods, setPaymentMethods] = useState<IPaymentMethods[]>([]);
+  const [acceptTrade, setAcceptTrade] = useState<boolean>(false);
+  const [images, setImages] = useState<IPhoto[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormDataProps>({
-    defaultValues: {
-      title,
-      description,
-      price,
-    },
-    resolver: yupResolver(editAdSchema),
-  });
 
   const { colors } = useTheme();
 
@@ -107,10 +91,10 @@ export const EditAd = () => {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   const handleGoBack = () => {
-    navigation.navigate("myaddetails", { id });
+    navigation.navigate("myads");
   };
 
-  const handleGoPreview = ({ title, description, price }: FormDataProps) => {
+  function handleGoPreview() {
     if (images.length === 0) {
       return toast.show({
         title: "Selecione ao menos uma imagem!",
@@ -126,16 +110,29 @@ export const EditAd = () => {
         bgColor: "red.500",
       });
     }
+    const rawPrice = Number(maskedPriceToNumber(price)) * 100;
+
+    if (price === '' || rawPrice <= 0) {
+      return toast.show({
+        title: 'Informe o valor do seu produto.',
+        placement: 'top',
+        bgColor: 'red.500',
+      });
+    }
+    console.log('id previewad =>', params.id)
 
     navigation.navigate("previewad", {
-      id,
-      title,
+      user,
+      product_images: images,
+      name,
       description,
-      price,
-      images,
-      paymentMethods,
-      isNew,
-      acceptTrade,
+      is_new: isNew === "Produto novo",
+      price: rawPrice,
+      accept_trade: acceptTrade,
+      payment_methods: paymentMethods,
+      imagesToDelete: imagesToDelete,
+      id: params.id,
+      is_active: isActive,
     });
   };
 
@@ -203,6 +200,34 @@ export const EditAd = () => {
     }
   };
 
+  function handleRemovePhoto(photo: IPhoto) {
+    setImages((prev) =>
+      prev.filter((item) => {
+        if (
+          item.name === photo.name &&
+          photo.uri.match(`${api.defaults.baseURL}/images/`)
+        ) {
+          setImagesToDelete((prev) => [...prev, photo.name]);
+        }
+        return item.name !== photo.name;
+      })
+    );
+  }
+
+  useEffect(() => {
+    if (params) {
+      setImages(params.product_images);
+      setName(params.name);
+      setDescription(params.description);
+      setIsNew(params.is_new ? "Produto novo" : "Produto usado");
+      setPrice(toMaskedPrice(String(params.price)));
+      setAcceptTrade(params.accept_trade);
+      setPaymentMethods(params.payment_methods);
+      setIsActive(params?.is_active ?? true);
+      setImagesToDelete([]);
+    }
+  }, [params]);
+
   return (
     <>
       <ScrollView
@@ -221,20 +246,35 @@ export const EditAd = () => {
           </Text>
 
           <HStack my={5}>
-            {images.map((imageData, index) => (
-              <Image
-                key={index}
-                w={88}
-                h={88}
-                mr={2}
-                source={{
-                  uri: `${api.defaults.baseURL}/images/${imageData.path}`,
-                }}
-                alt="Imagem do novo AD"
-                resizeMode="cover"
-                borderRadius={8}
-              />
-            ))}
+            {images.length > 0 &&
+              images.map((imageData, index) => (
+                <Stack key={index}>
+                  <Image
+                    key={index}
+                    w={88}
+                    h={88}
+                    mr={2}
+                    source={{ uri: imageData.uri }}
+                    alt="Imagem do novo AD"
+                    resizeMode="cover"
+                    borderRadius={8}
+                  />
+                  <Pressable
+                    w="4"
+                    h="4"
+                    rounded="full"
+                    bg="gray.600"
+                    alignItems="center"
+                    justifyContent="center"
+                    position="absolute"
+                    top={1}
+                    right={1}
+                    onPress={() => handleRemovePhoto(imageData)}
+                  >
+                    <X size={12} color={"white"} />
+                  </Pressable>
+                </Stack>
+              ))}
 
             {images.length < 3 && (
               <NativeButton
@@ -258,42 +298,22 @@ export const EditAd = () => {
             Sobre o produto
           </Heading>
 
-          <Controller
-            control={control}
-            name="title"
-            rules={{ required: "Informe o título" }}
-            render={({ field: { onChange, value } }) => (
-              <Input
-                placeholder="Título"
-                onChangeText={onChange}
-                value={value}
-                errorMessage={errors.title?.message}
-              />
-            )}
-          />
+          <Input placeholder="Título" onChangeText={setName} value={name} />
 
-          <Controller
-            control={control}
-            name="description"
-            rules={{ required: "Informe a descrição" }}
-            render={({ field: { onChange, value } }) => (
-              <Input
-                placeholder="Descrição"
-                multiline={true}
-                numberOfLines={5}
-                textAlignVertical="top"
-                onChangeText={onChange}
-                value={value}
-                errorMessage={errors.description?.message}
-              />
-            )}
+          <Input
+            placeholder="Descrição"
+            multiline={true}
+            numberOfLines={5}
+            textAlignVertical="top"
+            onChangeText={setDescription}
+            value={description}
           />
 
           <Radio.Group
-            name="productCondition"
+            name="Estado do produto"
             value={isNew ? "new" : "used"}
             onChange={(nextValue) => {
-              setIsNew(nextValue === "new" ? true : false);
+              setIsNew(nextValue === isNew ? 'Novo' : 'Usado');
             }}
           >
             <HStack>
@@ -314,20 +334,29 @@ export const EditAd = () => {
             Venda
           </Heading>
 
-          <Controller
-            control={control}
-            name="price"
-            rules={{ required: "Informe o preço!" }}
-            render={({ field: { onChange, value } }) => (
-              <Input
-                placeholder="0,00"
-                h="14"
-                mb={0}
-                onChangeText={onChange}
-                value={value}
-                errorMessage={errors.price?.message}
-              />
-            )}
+          <Input
+            leftElement={
+              <Text color="gray.7" fontFamily="body" fontSize="md" ml="4">
+                R$
+              </Text>
+            }
+            placeholder="Valor do produto"
+            h="14"
+            mb={0}
+            onChangeText={(text) => {
+              if (text === "0,0" || text === "0,") {
+                setPrice("");
+                return;
+              }
+              const firstMaskedText = toMaskedPrice(text);
+              const firstMaskedTextConvertToNumber =
+                maskedPriceToNumber(firstMaskedText);
+              const cleanMaskedText = toMaskedPrice(
+                firstMaskedTextConvertToNumber
+              );
+              setPrice(cleanMaskedText);
+            }}
+            value={price}
           />
 
           <Heading color="gray.2" fontSize={16} my={2}>
@@ -335,10 +364,12 @@ export const EditAd = () => {
           </Heading>
 
           <Switch
-            onToggle={(value) => setAcceptTrade(value)}
-            value={acceptTrade}
-            size="lg"
-            m={0}
+            size="sm"
+            alignSelf="flex-start"
+            offTrackColor="gray.3"
+            onTrackColor="blue.5"
+            isChecked={acceptTrade}
+            onToggle={setAcceptTrade}
           />
 
           <Heading color="gray.2" fontSize={16} my={2}>
@@ -397,7 +428,7 @@ export const EditAd = () => {
           justifyContent="center"
           w="47%"
           h={12}
-          onPress={handleSubmit(handleGoPreview)}
+          onPress={handleGoPreview}
         />
       </HStack>
     </>

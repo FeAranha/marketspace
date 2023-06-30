@@ -8,7 +8,7 @@ import { api } from "@services/api";
 
 type Props = {
   variant?: "adActive" | "adInactive";
-  id: string;
+  id?: string;
   AdOwner: string;
   title: string;
   description: string;

@@ -1,4 +1,4 @@
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import {
   HStack,
@@ -6,11 +6,10 @@ import {
   Stack,
   useToast,
   ScrollView,
-  Text,
   Heading,
 } from "native-base";
 import { AntDesign } from "@expo/vector-icons";
-import { ReactElement, useCallback, useEffect, useState } from "react";
+import { ReactElement, useCallback, useState } from "react";
 import { Loading } from "@components/Loading";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
@@ -19,55 +18,57 @@ import { ProductDetails } from "@components/ProductDetails";
 import { useAuth } from "@hooks/useAuth";
 import { Button } from "@components/Button";
 import { Power } from "phosphor-react-native";
+import { IProduct } from "src/interfaces/IProduct";
+import { ProductMap } from "../mappers/ProductMap";
+import { toMaskedPrice } from "@utils/Masks";
 
-type RouteParams = { id: string};
+type ParamsProps = {
+  id: string;
+};
 
 export const MyAdDetails = (): ReactElement => {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const [adActive, setAdActive] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeletingLoading, setIsDeletingLoading] = useState(false);
-  const { user } = useAuth();
+  const { user, fetchUserProducts } = useAuth();
   const route = useRoute();
   const toast = useToast();
+  const [data, setData] = useState<IProduct>({} as IProduct);
+  //const [is_active, setIs_active] = useState(true);
 
-  const { id } = route.params as RouteParams;
+  const { id } = route.params as ParamsProps;
 
   const [product, setProduct] = useState({} as ProductDTO);
+  
+  const params = route.params as ParamsProps;
 
   const handleGoBack = useCallback(() => {
     navigation.navigate("myads");
   }, [navigation]);
 
   const handleGoEditAd = () => {
-     navigation.navigate("editad", {
-       title: product.name,
-       description: product.description,
-       price: product.price.toString(),
-       images: product.product_images,
-       paymentMethods: product.payment_methods.map((item) => item.key),
-       isNew: product.is_new,
-       acceptTrade: product.is_traded,
-       id: product.id,
-     });
+    navigation.navigate("editad", data)
+    console.log('data for edit=> ', data,
+    'id=>', data.id,
+    'params ID:', params.id
+    )
   };
 
-  const handleChangeActive = useCallback(async () => {
+  async function handleChangeActive() {
     try {
-      setAdActive(true);
-      const data = await api.patch(`products/${id}`, {
-        is_active: !product.is_active,
+      await api.patch(`products/${params.id}`, {
+        is_active: !adActive,
       });
 
-      setProduct((state) => {
-        return {
-          ...state,
-          is_active: !state.is_active,
-        };
-      });
+      await fetchUserProducts()
+      let dataState = data
+      dataState.is_active = !adActive
+      setData(dataState)
+      setAdActive((prev) => !prev)
       toast.show({
         title: `Anúncio ${
-          product.is_active ? "desativado" : "ativado"
+          !adActive ? "ativado" : "desativado"
         } com sucesso!`,
         placement: "top",
         bgColor: "green.500",
@@ -86,9 +87,9 @@ export const MyAdDetails = (): ReactElement => {
         });
       }
     } finally {
-      setAdActive(false);
+      //setAdActive(false);
     }
-  }, [id, product.is_active]);
+  };
 
   const handleDeleteAd = useCallback(async () => {
     try {
@@ -112,29 +113,40 @@ export const MyAdDetails = (): ReactElement => {
     }
   }, [id, navigation]);
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const productData = await api.get(`products/${id}`);
-        setProduct(productData.data);
-        setIsLoading(false);
-      } catch (error) {
-        const isAppError = error instanceof AppError;
-        const title = isAppError
-          ? error.message
-          : "Não foi possível receber os dados do anúncio. Tente Novamente!";
+  async function fetchData() {
+    try {
+      setIsLoading(true);
 
-        if (isAppError) {
-          toast.show({
-            title,
-            placement: "top",
-            bgColor: "red.500",
-          });
-        }
-      }
-    };
-    loadData();
-  }, [id]);
+      const { data } = await api.get(`/products/${id}`);
+
+      setData(ProductMap.toIProduct(data));
+      setAdActive(data.is_active)
+      console.log('myadsDetails data=> ', data,
+      '----------------',
+      data.id
+      )
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível carregar o anúncio. Tente novamente mais tarde.';
+
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+      console.log('fix', id)
+    }, [id])
+  );
 
   return (
     <ScrollView
@@ -171,7 +183,7 @@ export const MyAdDetails = (): ReactElement => {
               onPress={handleGoEditAd}
             />
           </HStack>
-          {!product.is_active && (
+          {!adActive && (
             <Heading
               bg="gray.3"
               flex={1}
@@ -187,7 +199,6 @@ export const MyAdDetails = (): ReactElement => {
               borderRadius={10}
               top="30%"
               left="20%"
-              
             >
               ANÚNCIO DESATIVADO
             </Heading>
@@ -195,23 +206,23 @@ export const MyAdDetails = (): ReactElement => {
 
           {product && (
             <ProductDetails
-              id={product.id}
-              AdOwner={user.name}
-              title={product.name}
-              description={product.description}
-              price={product.price.toString()}
-              isNew={product.is_new}
-              acceptTrade={product.is_traded}
-              productImgs={product.product_images}
-              paymentMethods={product.payment_methods.map((item) => item.key)}
-              isActive={product.is_active}
+              id={data.id}
+              AdOwner={data.user.name}
+              title={data.name}
+              description={data.description}
+              price= {toMaskedPrice(String(data.price))}
+              isNew={data.is_new}
+              acceptTrade={data.accept_trade}
+              productImgs={data.product_images}
+              paymentMethods={data.payment_methods}
+              isActive={adActive}
               profileImage={`${api.defaults.baseURL}/images/${user.avatar}`}
             />
           )}
           <HStack mx={6}>
             <Button
               w="full"
-              bgColor={product.is_active ? "gray.1" : "#647AC7"}
+              bgColor={adActive ? "gray.1" : "#647AC7"}
               startIcon={
                 <Icon
                   as={<Power size={20} color="#EDECEE" weight="regular" />}
@@ -219,7 +230,7 @@ export const MyAdDetails = (): ReactElement => {
               }
               mt={2}
               title={
-                product.is_active ? "Desativar anúncio" : "Reativar anúncio"
+                adActive ? "Desativar anúncio" : "Reativar anúncio"
               }
               onPress={handleChangeActive}
             />

@@ -15,47 +15,23 @@ import HomeSvg from "@assets/home.svg";
 import ADSvg from "@assets/AD.svg";
 import LogoffSvg from "@assets/logout.svg";
 import { useTheme } from "native-base";
+import { IProduct } from "src/interfaces/IProduct";
 
 type AppRoutes = {
   home: undefined;
   myads: undefined;
   logoff: undefined;
   createad: undefined;
-  previewad: {
-    id?: string
-    title: string;
-    description: string;
-    images: any[];
-    price: string;
-    paymentMethods: string[];
-    isNew: boolean;
-    acceptTrade: boolean;
-    isActive?: boolean;
+  previewad: IProduct & {
+    imagesToDelete: string[];
   };
   addetails: {
     id: string;
   };
   myaddetails: {
     id: string;
-    title?: string;
-    description?: string;
-    images?: any[];
-    price?: string;
-    paymentMethods?: string[];
-    isNew?: boolean;
-    acceptTrade?: boolean;
-    isActive?: boolean;
   };
-  editad: {
-    title?: string;
-    description?: string;
-    price?: string;
-    images?: any[];
-    paymentMethods?: string[];
-    isNew?: boolean;
-    acceptTrade?: boolean;
-    id: string;
-  };
+  editad: undefined | IProduct;
 };
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRoutes>;

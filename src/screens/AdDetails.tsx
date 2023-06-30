@@ -141,7 +141,7 @@ export const AdDetails = (): ReactElement => {
             description={product.description}
             price={product.price.toString()}
             isNew={product.is_new}
-            acceptTrade={product.is_traded}
+            acceptTrade={product.accept_trade}
             productImgs={product.product_images}
             paymentMethods={product.payment_methods.map((item) => item.key)}
             isActive={product.is_active}

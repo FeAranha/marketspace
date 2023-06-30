@@ -14,9 +14,13 @@ import {
 } from "@storage/storageAuthToken";
 
 import { api } from "@services/api";
+import { IProduct } from '../interfaces/IProduct';
+import { ProductMap } from '../mappers/ProductMap';
+import { ProductDTO } from "@dtos/ProductDTO";
 
 export type AuthContextDataProps = {
   user: UserDTO;
+  fetchUserProducts: () => Promise<void>;
   signIn: (email: string, password: string) => void;
   token: string;
   signOut: () => void;
@@ -37,6 +41,9 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const [isLoadingUserStorageData, setIsLoadingUserStorageData] =
     useState(true);
 
+  const [userProducts, setUserProducts] = useState<IProduct[]>(
+    [] as IProduct[]
+  );
   async function updateUserProfile(userUpdated: UserDTO) {
     try {
       setUser(userUpdated);
@@ -98,7 +105,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const signIn = async (email: string, password: string) => {
     try {
       const { data } = await api.post("/sessions", { email, password });
-      console.log('Token=> ', data.token)
+      console.log("Token=> ", data.token);
       if (data.user && data.token) {
         await storageUserAndTokenSave(data.user, data.token);
         userAndTokenUpdate(data.user, data.token);
@@ -110,18 +117,32 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     }
   };
 
+  async function fetchUserProducts() {
+    try {
+      const { data } = await api.get("/users/products");
+      setUserProducts(
+        data.map((item: ProductDTO) => ProductMap.toIProduct(item))
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+
   useEffect(() => {
     loadUserData();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      signIn, 
-      token, 
-      signOut,
-      isLoadingUserStorageData, 
-      }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        fetchUserProducts,
+        signIn,
+        token,
+        signOut,
+        isLoadingUserStorageData,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

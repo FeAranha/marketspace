@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { useState } from "react";
 import {
   Center,
   Heading,
@@ -23,118 +23,110 @@ import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { generatePaymentMethods } from "@utils/generatePaymentMethods";
 import { Dimensions } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
-import { ProductDTO } from "@dtos/ProductDTO";
+import { IPhoto } from "src/interfaces/IPhoto";
+import { IProduct } from "src/interfaces/IProduct";
 
-type RouteParams = {
-  id?: string;
-  title: string;
-  description: string;
-  price: string;
-  images: any[];
-  paymentMethods: string[];
-  isNew: boolean;
-  acceptTrade: boolean;
-  isActive?: boolean;
-};
-
-export const PreviewAD = (): ReactElement => {
+export function PreviewAD() {
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation<AppNavigatorRoutesProps>();
-
-  const { user } = useAuth();
+  const { user, fetchUserProducts } = useAuth();
 
   const toast = useToast();
 
   const route = useRoute();
-  const {
-    id,
-    title,
-    description,
-    price,
-    images,
-    paymentMethods,
-    isNew,
-    acceptTrade,
-    isActive,
-  } = route.params as RouteParams;
 
-  const [product, setProduct] = useState({} as ProductDTO);
+  const params = route.params as IProduct & { imagesToDelete: string[] };
 
   const handleGoEditAd = () => {
-    if (typeof id === "string") {
-      navigation.navigate("editad", {
-        id: id,
-      });
-    }
+      navigation.navigate("editad");
   };
-
   async function handlePublish() {
-    setIsLoading(true);
     try {
-      let product;
-      if (id) {
-        product = await api.put(`products/${id}`, {
-          name: title,
-          description,
-          price: parseInt(price.replace(/[^0-9]/g, "")),
-          payment_methods: paymentMethods,
-          is_new: isNew,
-          accept_trade: acceptTrade,
-          user: { connect: { id: user.id } },
-        });
+      setIsLoading(true);
 
-        navigation.navigate("myaddetails", {
-          id: id,
-          title: title,
-          description: description,
-          images: images,
-          price: price,
-          paymentMethods: paymentMethods,
-          isNew: isNew,
-          acceptTrade: acceptTrade,
-          isActive: isActive,
-        });
-      } else {
-        product = await api.post("/products", {
-          name: title,
-          description,
-          price: parseInt(price.replace(/[^0-9]/g, "")),
-          payment_methods: paymentMethods,
-          is_new: isNew,
-          accept_trade: acceptTrade,
-        });
-      }
-
-      const imgData = new FormData();
-
-      images.forEach((item) => {
-        const imgFile = {
-          ...item,
-          name: user.name + "." + item.name,
-        } as any;
-
-        imgData.append("images", imgFile);
+      const { data } = await api.post("/products", {
+        name: params.name,
+        description: params.description,
+        price: Number(params.price.toFixed(0)),
+        payment_methods: params.payment_methods,
+        is_new: params.is_new,
+        accept_trade: params.accept_trade,
       });
 
-      imgData.append("product_id", product.data.id);
+      const formData = new FormData();
+      formData.append("product_id", data.id);
 
-      const imgsData = await api.post("/products/images", imgData, {
+      params.product_images.map((photo) => {
+        formData.append("images", photo as any);
+      });
+      await api.post("/products/images", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+      await fetchUserProducts();
 
-      navigation.navigate("myaddetails", {
-        id: product.data.id,
-        description,
-        isActive,
-        isNew,
-        acceptTrade,
-        paymentMethods,
-        price,
-        images,
-        title,
+      navigation.navigate("myaddetails", { id: data.id });
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível publicar, tente novamente mais tarde";
+
+      if (isAppError) {
+        toast.show({
+          title,
+          placement: "top",
+          bgColor: "red.500",
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleUpdate() {
+    try {
+      setIsLoading(true);
+
+      if (params.imagesToDelete.length > 0) {
+        await api.delete(`/products/images/`, {
+          data: { productImagesIds: params.imagesToDelete },
+        });
+      }
+      await api.put(`/products/${params.id}`, {
+        name: params.name,
+        description: params.description,
+        is_new: params.is_new,
+        price: Number(params.price.toFixed(0)),
+        accept_trade: params.accept_trade,
+        payment_methods: params.payment_methods,
       });
+
+      let imagesToUpload = [] as IPhoto[];
+      params.product_images.map((photo) => {
+        if (!photo.uri.match(`${api.defaults.baseURL}/images/`)) {
+          imagesToUpload = [...imagesToUpload, photo];
+        }
+      });
+      if (imagesToUpload.length > 0) {
+        const formData = new FormData();
+        formData.append("product_id", params.id as string);
+
+        imagesToUpload.map((photo) => {
+          if (!photo.uri.match(`${api.defaults.baseURL}/images/`)) {
+            formData.append("images", photo as any);
+          }
+        });
+        await api.post("/products/images", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      }
+      await fetchUserProducts()
+      navigation.navigate('myaddetails', { id: params.id as string });
+
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
@@ -154,7 +146,7 @@ export const PreviewAD = (): ReactElement => {
   }
 
   const width = Dimensions.get("window").width;
-
+console.log('id prod=>', params.id)
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
@@ -176,8 +168,8 @@ export const PreviewAD = (): ReactElement => {
           loop
           width={width}
           height={320}
-          autoPlay={images.length > 1}
-          data={images}
+          autoPlay={params.product_images.length > 1}
+          data={params.product_images}
           scrollAnimationDuration={1000}
           renderItem={({ item }) => (
             <Image
@@ -186,7 +178,7 @@ export const PreviewAD = (): ReactElement => {
               source={{
                 uri: item.uri
                   ? item.uri
-                  : `${api.defaults.baseURL}/images/${item.path}`,
+                  : `${api.defaults.baseURL}/images/${item.uri}`,
               }}
               alt="Ad Image"
               resizeMode="cover"
@@ -207,7 +199,7 @@ export const PreviewAD = (): ReactElement => {
               size={6}
             />
             <Text fontFamily="body" fontSize="sm">
-              {user.name}
+              {params.user.name}
             </Text>
           </HStack>
 
@@ -217,29 +209,29 @@ export const PreviewAD = (): ReactElement => {
             w={12}
             alignItems="center"
             rounded="full"
-            bg={isNew ? "blue.5" : "gray.2"}
+            bg={params.is_new ? "blue.5" : "gray.2"}
           >
             <Text fontFamily="heading" fontSize="ss" color="white">
-              {isNew ? "Novo" : "Usado"}
+              {params.is_new ? "Novo" : "Usado"}
             </Text>
           </Box>
 
           <HStack mt={2} alignItems="center" justifyContent="space-between">
             <Heading fontFamily="heading" fontSize="lg" color="gray.1">
-              {title}
+              {params.name}
             </Heading>
             <HStack alignItems="center">
               <Heading mr={1} fontFamily="heading" fontSize="sm" color="blue.5">
                 R${""}
               </Heading>
               <Heading fontFamily="heading" fontSize="lg" color="blue.5">
-                {price}
+                {params.price}
               </Heading>
             </HStack>
           </HStack>
 
           <Text mt={2} color="gray.2" fontFamily="body" fontSize="sm">
-            {description}
+            {params.description}
           </Text>
 
           <HStack my={4} alignItems="center">
@@ -247,11 +239,11 @@ export const PreviewAD = (): ReactElement => {
               Aceita troca?{" "}
             </Heading>
             <Text ml={2} fontSize="sm" fontFamily="body">
-              {acceptTrade ? "Sim" : "Não"}
+              {params.accept_trade ? "Sim" : "Não"}
             </Text>
           </HStack>
 
-          {generatePaymentMethods(paymentMethods, "#1A181B")}
+          {generatePaymentMethods(params.payment_methods, "#1A181B")}
         </VStack>
 
         <HStack
@@ -278,12 +270,10 @@ export const PreviewAD = (): ReactElement => {
             leftIcon={<Icon mr={2} as={<Tag color="#EDECEE" size={16} />} />}
             w={40}
             title="Publicar"
-            onPress={handlePublish}
+            onPress={!!params.id ? handleUpdate : handlePublish}
           />
         </HStack>
       </Stack>
     </ScrollView>
   );
 };
-
-export default PreviewAD;

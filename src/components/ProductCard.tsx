@@ -6,11 +6,11 @@ import { AppNavigatorRoutesProps } from "@routes/app.routes";
 type Props = TouchableOpacityProps & {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   price: string;
   isNew: boolean;
-  acceptTrade: boolean;
-  paymentMethods: string[];
+  acceptTrade?: boolean;
+  paymentMethods?: string[];
   isActive?: boolean;
   image: string;
   showProfile?: boolean;
@@ -37,16 +37,9 @@ export function ProductCard({
     if (showProfile) {
       navigation.navigate("addetails", { id });
     } else {
-      navigation.navigate("myaddetails", {
-        id,
-        title,
-        description,
-        price,
-        paymentMethods,
-        isNew,
-        acceptTrade,
-        isActive,
-      });
+      const productId: string = id as string;
+      console.log('id esperado =>',productId)
+      navigation.navigate("myaddetails", { id: productId });
     }
   }
   return (

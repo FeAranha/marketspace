@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LogBox } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useForm, Controller } from "react-hook-form";
-import { useNavigation } from "@react-navigation/native";
 import { ScrollView } from "react-native-virtualized-view";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import {
@@ -25,15 +25,18 @@ import {
 import { Feather } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
-
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 import { ScreenHeader } from "@components/ScreenHeader";
 import { AppError } from "@utils/AppError";
-
+import { Plus } from "phosphor-react-native";
+import { IProduct } from "src/interfaces/IProduct";
+import { useAuth } from "@hooks/useAuth";
+import { maskedPriceToNumber, toMaskedPrice } from "@utils/Masks";
+import { IPaymentMethods } from "src/interfaces/IPaymentMethods";
+import { IPhoto } from "src/interfaces/IPhoto";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Plus } from "phosphor-react-native";
 
 const createAdSchema = yup.object({
   title: yup
@@ -43,26 +46,31 @@ const createAdSchema = yup.object({
   description: yup
     .string()
     .required("Informe uma descrição.")
-    .min(12, "A descrição deve ser detalhada!"),
+    .min(1, "A descrição deve ser detalhada!"),
   price: yup.string().required("Informe um preço."),
 });
-
 type FormDataProps = {
-  title: string;
+  name: string;
   description: string;
   price: string;
 };
-
 export function CreateAD() {
-  const [isNew, setIsNew] = useState(false);
-  const [paymentMethods, setPaymentMethods] = useState<string[]>([]);
+  const { user } = useAuth();
+  const [paymentMethods, setPaymentMethods] = useState<IPaymentMethods[]>([]);
   const [acceptTrade, setAcceptTrade] = useState(false);
-  const [images, setImages] = useState<any[]>([]);
+  const [images, setImages] = useState<IPhoto[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [name, setName] = useState("");
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const { colors } = useTheme();
   const toast = useToast();
+  const route = useRoute();
+  const [description, setDescription] = useState("");
+  const params = route.params as IProduct;
+  const [isNew, setIsNew] = useState<string>("");
+  const [price, setPrice] = useState("");
+  const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
+  const [isActive, setIsActive] = useState(true);
 
   const {
     control,
@@ -70,13 +78,12 @@ export function CreateAD() {
     formState: { errors },
   } = useForm<FormDataProps>({
     defaultValues: {
-      title: "",
+      name: "",
       description: "",
       price: "",
     },
     resolver: yupResolver(createAdSchema),
   });
-
   function handleGoBack() {
     navigation.goBack();
   }
@@ -150,10 +157,20 @@ export function CreateAD() {
     navigation.navigate("myads");
   }
 
-  function handlePreviewAD({ title, description, price }: FormDataProps) {
+  function handlePreviewAD() {
     if (images.length === 0) {
       return toast.show({
         title: "Selecione ao menos uma imagem!",
+        placement: "top",
+        bgColor: "red.500",
+      });
+    }
+
+    const rawPrice = Number(maskedPriceToNumber(price)) * 100;
+
+    if (price === "" || rawPrice <= 0) {
+      return toast.show({
+        title: "Informe o valor do seu produto.",
         placement: "top",
         bgColor: "red.500",
       });
@@ -168,15 +185,33 @@ export function CreateAD() {
     }
 
     navigation.navigate("previewad", {
-      title,
+      user,
+      product_images: images,
+      name,
       description,
-      images,
-      price,
-      paymentMethods,
-      isNew,
-      acceptTrade,
+      is_new: isNew === "Produto novo",
+      price: rawPrice,
+      accept_trade: acceptTrade,
+      payment_methods: paymentMethods,
+      imagesToDelete: imagesToDelete,
+      id: params?.id,
+      is_active: isActive,
     });
   }
+
+  useEffect(() => {
+    if (params) {
+      setImages(params.product_images);
+      setName(params.name);
+      setDescription(params.description);
+      setIsNew(params.is_new ? "Produto novo" : "Produto usado");
+      setPrice(toMaskedPrice(String(params.price)));
+      setAcceptTrade(params.accept_trade);
+      setPaymentMethods(params.payment_methods);
+      setIsActive(params?.is_active ?? true);
+      setImagesToDelete([]);
+    }
+  }, [params]);
 
   return (
     <ScrollView
@@ -243,56 +278,40 @@ export function CreateAD() {
           Sobre o produto
         </Heading>
 
-        <Controller
-          control={control}
-          name="title"
-          rules={{ required: "Informe o título" }}
-          render={({ field: { onChange, value } }) => (
-            <Input
-              mt={4}
-              placeholder="Título do anúncio"
-              fontSize="md"
-              onChangeText={onChange}
-              value={value}
-              errorMessage={errors.title?.message}
-            />
-          )}
+        <Input
+          mt={4}
+          placeholder="Título do anúncio"
+          fontSize="md"
+          onChangeText={setName}
+          value={name}
         />
 
-        <Controller
-          control={control}
-          name="description"
-          rules={{ required: "Informe a descrição" }}
-          render={({ field: { onChange, value } }) => (
-            <TextArea
-              h={160}
-              placeholder="Descrição do produto"
-              w="full"
-              maxW="full"
-              autoCompleteType={undefined}
-              fontFamily="body"
-              fontSize="md"
-              color="gray.2"
-              bg="gray.7"
-              rounded={8}
-              borderWidth={0}
-              _focus={{
-                bg: "gray.7",
-                borderWidth: 1,
-                borderColor: "gray.3",
-              }}
-              onChangeText={onChange}
-              value={value}
-              //errorMessage={errors.description?.message}
-            />
-          )}
+        <TextArea
+          h={160}
+          placeholder="Descrição do produto"
+          w="full"
+          maxW="full"
+          autoCompleteType={undefined}
+          fontFamily="body"
+          fontSize="md"
+          color="gray.2"
+          bg="gray.7"
+          rounded={8}
+          borderWidth={0}
+          _focus={{
+            bg: "gray.7",
+            borderWidth: 1,
+            borderColor: "gray.3",
+          }}
+          onChangeText={setDescription}
+          value={description}
         />
 
         <Radio.Group
           name="productCondition"
           value={isNew ? "new" : "used"}
           onChange={(nextValue) => {
-            setIsNew(nextValue === "new" ? true : false);
+            setIsNew(nextValue);
           }}
         >
           <HStack>
@@ -328,9 +347,8 @@ export function CreateAD() {
                     ml={1}
                   />
                 }
-                onChangeText={onChange}
-                value={value}
-                errorMessage={errors.price?.message}
+                onChangeText={setPrice}
+                value={price}
                 placeholder="Valor do produto"
                 fontFamily="body"
                 fontSize="md"
@@ -404,7 +422,7 @@ export function CreateAD() {
           w={40}
           title="Avançar"
           bgColor="gray.1"
-          onPress={handleSubmit(handlePreviewAD)}
+          onPress={handlePreviewAD}
         />
       </HStack>
     </ScrollView>
