@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { LogBox } from "react-native";
 
 import {
@@ -11,21 +11,18 @@ import {
   Button as NativeButton,
   useTheme,
   Pressable,
-  Radio,
   Checkbox,
   Switch,
   useToast,
   Stack,
 } from "native-base";
 
-import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { Input } from "@components/Input";
+import { Radio } from "@components/Radio";
 import { Button } from "@components/Button";
 import { ScreenHeader } from "@components/ScreenHeader";
 import { Plus, X } from "phosphor-react-native";
@@ -37,35 +34,6 @@ import { maskedPriceToNumber, toMaskedPrice } from "@utils/Masks";
 import { IPaymentMethods } from "src/interfaces/IPaymentMethods";
 import { IPhoto } from "src/interfaces/IPhoto";
 import { useAuth } from "@hooks/useAuth";
-
-const editAdSchema = yup.object({
-  title: yup
-    .string()
-    .required("Informe um título.")
-    .min(2, "O título deve ter no mínimo 2 letras."),
-  description: yup
-    .string()
-    .required("Informe uma descrição.")
-    .min(10, "A descrição deve ser detalhada!"),
-  price: yup.string().required("Informe um preço."),
-});
-
-type RouteParams = {
-  title: string;
-  description: string;
-  price: string;
-  images: any[];
-  paymentMethods: string[];
-  isNew: boolean;
-  acceptTrade: boolean;
-  id: string;
-};
-
-type FormDataProps = {
-  title: string;
-  description: string;
-  price: string;
-};
 
 export const EditAd = () => {
   const route = useRoute();
@@ -112,14 +80,13 @@ export const EditAd = () => {
     }
     const rawPrice = Number(maskedPriceToNumber(price)) * 100;
 
-    if (price === '' || rawPrice <= 0) {
+    if (price === "" || rawPrice <= 0) {
       return toast.show({
-        title: 'Informe o valor do seu produto.',
-        placement: 'top',
-        bgColor: 'red.500',
+        title: "Informe o valor do seu produto.",
+        placement: "top",
+        bgColor: "red.500",
       });
     }
-    console.log('id previewad =>', params.id)
 
     navigation.navigate("previewad", {
       user,
@@ -131,10 +98,10 @@ export const EditAd = () => {
       accept_trade: acceptTrade,
       payment_methods: paymentMethods,
       imagesToDelete: imagesToDelete,
-      id: params.id,
+      id: params?.id,
       is_active: isActive,
     });
-  };
+  }
 
   const handleAdPhotoSelect = async () => {
     try {
@@ -309,26 +276,16 @@ export const EditAd = () => {
             value={description}
           />
 
-          <Radio.Group
+          <Radio
+            mt={4}
+            data={["Produto novo", "Produto usado"]}
             name="Estado do produto"
-            value={isNew ? "new" : "used"}
-            onChange={(nextValue) => {
-              setIsNew(nextValue === isNew ? 'Novo' : 'Usado');
+            accessibilityLabel="Escolha o estado do produto"
+            value={isNew}
+            onChange={(newValue) => {
+              setIsNew(newValue);
             }}
-          >
-            <HStack>
-              <Radio value="new" my="2" size="sm">
-                <Text color="gray.2" fontSize={14}>
-                  Produto novo
-                </Text>
-              </Radio>
-              <Radio value="used" my="2" ml={5} size="sm">
-                <Text color="gray.2" fontSize={14}>
-                  Produto usado
-                </Text>
-              </Radio>
-            </HStack>
-          </Radio.Group>
+          />
 
           <Heading color="gray.2" fontSize={16} mb={2} mt={5}>
             Venda
@@ -336,13 +293,14 @@ export const EditAd = () => {
 
           <Input
             leftElement={
-              <Text color="gray.7" fontFamily="body" fontSize="md" ml="4">
+              <Text color="gray.2" fontFamily="body" fontSize="md" ml="4">
                 R$
               </Text>
             }
             placeholder="Valor do produto"
             h="14"
             mb={0}
+            value={price}
             onChangeText={(text) => {
               if (text === "0,0" || text === "0,") {
                 setPrice("");
@@ -356,7 +314,6 @@ export const EditAd = () => {
               );
               setPrice(cleanMaskedText);
             }}
-            value={price}
           />
 
           <Heading color="gray.2" fontSize={16} my={2}>

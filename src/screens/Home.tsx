@@ -347,9 +347,7 @@ export function Home() {
                   <ProductCard
                     id={item.id}
                     image={`${api.defaults.baseURL}/images/${item.product_images[0].path}`}
-                    price={item.price
-                      .toFixed(2)
-                      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
+                    price={item.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     isNew={item.is_new}
                     title={item.name}
                     showProfile

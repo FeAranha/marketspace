@@ -25,6 +25,7 @@ import { Dimensions } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import { IPhoto } from "src/interfaces/IPhoto";
 import { IProduct } from "src/interfaces/IProduct";
+import { toMaskedPrice } from "@utils/Masks";
 
 export function PreviewAD() {
   const [isLoading, setIsLoading] = useState(false);
@@ -225,7 +226,8 @@ console.log('id prod=>', params.id)
                 R${""}
               </Heading>
               <Heading fontFamily="heading" fontSize="lg" color="blue.5">
-                {params.price}
+              {toMaskedPrice(String(params.price))}
+                {}
               </Heading>
             </HStack>
           </HStack>

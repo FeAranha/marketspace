@@ -1,5 +1,4 @@
 import { HStack, Image, Text, Heading, Box, VStack, Stack } from "native-base";
-import { Bank, Barcode, QrCode, Tag } from "phosphor-react-native";
 import { useAuth } from "@hooks/useAuth";
 import { generatePaymentMethods } from "@utils/generatePaymentMethods";
 import { Dimensions } from "react-native";

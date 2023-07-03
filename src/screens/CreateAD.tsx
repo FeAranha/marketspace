@@ -19,9 +19,8 @@ import {
   Checkbox,
   InputLeftAddon,
   Button as NativeButton,
-  Radio,
 } from "native-base";
-
+import { Radio } from "@components/Radio";
 import { Feather } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
@@ -307,26 +306,16 @@ export function CreateAD() {
           value={description}
         />
 
-        <Radio.Group
-          name="productCondition"
-          value={isNew ? "new" : "used"}
-          onChange={(nextValue) => {
-            setIsNew(nextValue);
+        <Radio
+          mt={4}
+          data={["Produto novo", "Produto usado"]}
+          name="Estado do produto"
+          accessibilityLabel="Escolha o estado do produto"
+          value={isNew}
+          onChange={(newValue) => {
+            setIsNew(newValue);
           }}
-        >
-          <HStack>
-            <Radio value="new" my="2" size="sm">
-              <Text color="gray.2" fontSize={14}>
-                Produto novo
-              </Text>
-            </Radio>
-            <Radio value="used" my="2" ml={5} size="sm">
-              <Text color="gray.2" fontSize={14}>
-                Produto usado
-              </Text>
-            </Radio>
-          </HStack>
-        </Radio.Group>
+        />
 
         <Heading mt={8} fontFamily="heading" fontSize="md" color="gray.2">
           Venda

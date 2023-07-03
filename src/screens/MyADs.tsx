@@ -18,6 +18,7 @@ import { ProductDTO } from "@dtos/ProductDTO";
 import { AppError } from "@utils/AppError";
 import { api } from "@services/api";
 import { Loading } from "@components/Loading";
+import { toMaskedPrice } from "@utils/Masks";
 
 export function MyADs() {
   const [isLoading, setIsLoading] = useState(true);
@@ -105,7 +106,7 @@ export function MyADs() {
           <VStack p={6}>
             <HStack justifyContent="space-between" mb={4}>
               <Text fontSize="md" color="gray.3">
-                {products.length} anúncios
+                {productsByFilter.length} anúncios
               </Text>
 
               <Stack w={111}>
@@ -140,9 +141,7 @@ export function MyADs() {
                     id={item.id}
                     image={`${api.defaults.baseURL}/images/${item.product_images[0].path}`}
                     isActive={item.is_active}
-                    price={item.price
-                      .toFixed(2)
-                      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
+                    price= {toMaskedPrice(String(item.price))}
                     isNew={item.is_new}
                     title={item.name}
                     profileImage={`${api.defaults.baseURL}/images/${item.user?.avatar}`}
