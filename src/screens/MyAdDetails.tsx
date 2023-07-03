@@ -7,6 +7,7 @@ import {
   useToast,
   ScrollView,
   Heading,
+  VStack,
 } from "native-base";
 import { AntDesign } from "@expo/vector-icons";
 import { ReactElement, useCallback, useState } from "react";
@@ -17,7 +18,7 @@ import { ProductDTO } from "../dtos/ProductDTO";
 import { ProductDetails } from "@components/ProductDetails";
 import { useAuth } from "@hooks/useAuth";
 import { Button } from "@components/Button";
-import { Power } from "phosphor-react-native";
+import { Power, Trash  } from "phosphor-react-native";
 import { IProduct } from "src/interfaces/IProduct";
 import { ProductMap } from "../mappers/ProductMap";
 import { toMaskedPrice } from "@utils/Masks";
@@ -30,16 +31,13 @@ export const MyAdDetails = (): ReactElement => {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const [adActive, setAdActive] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDeletingLoading, setIsDeletingLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { user, fetchUserProducts } = useAuth();
   const route = useRoute();
   const toast = useToast();
   const [data, setData] = useState<IProduct>({} as IProduct);
-  //const [is_active, setIs_active] = useState(true);
 
   const { id } = route.params as ParamsProps;
-
-  const [product, setProduct] = useState({} as ProductDTO);
   
   const params = route.params as ParamsProps;
 
@@ -91,11 +89,11 @@ export const MyAdDetails = (): ReactElement => {
     }
   };
 
-  const handleDeleteAd = useCallback(async () => {
+  async function handleDeleteAd() {
     try {
-      setIsDeletingLoading(true);
-      await api.delete(`products/${id}`);
-
+      setIsDeleting(true);
+      await api.delete(`products/${params.id}`);
+      await fetchUserProducts();
       navigation.navigate("myads");
     } catch (error) {
       const isAppError = error instanceof AppError;
@@ -110,8 +108,10 @@ export const MyAdDetails = (): ReactElement => {
           bgColor: "red.500",
         });
       }
+    }finally {
+      setIsDeleting(false)
     }
-  }, [id, navigation]);
+  }
 
   async function fetchData() {
     try {
@@ -204,7 +204,7 @@ export const MyAdDetails = (): ReactElement => {
             </Heading>
           )}
 
-          {product && (
+          {data && (
             <ProductDetails
               id={data.id}
               AdOwner={data.user.name}
@@ -219,7 +219,7 @@ export const MyAdDetails = (): ReactElement => {
               profileImage={`${api.defaults.baseURL}/images/${user.avatar}`}
             />
           )}
-          <HStack mx={6}>
+          <VStack mx={6}>
             <Button
               w="full"
               bgColor={adActive ? "gray.1" : "#647AC7"}
@@ -234,7 +234,19 @@ export const MyAdDetails = (): ReactElement => {
               }
               onPress={handleChangeActive}
             />
-          </HStack>
+
+            <Button
+            mt={2}
+            title="Excluir anúncio"
+            variant='solid'
+            startIcon={
+              <Icon
+                as={<Trash size={20} color="#5F5B62" weight="regular" />}
+              />
+            }
+            onPress={handleDeleteAd}
+            />
+          </VStack>
         </Stack>
       )}
     </ScrollView>
