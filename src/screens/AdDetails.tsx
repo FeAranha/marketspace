@@ -22,6 +22,7 @@ import { AppError } from "@utils/AppError";
 import { Loading } from "@components/Loading";
 import React from "react";
 import { Linking, Platform, TextInput } from "react-native";
+import { toMaskedPrice } from "@utils/Masks";
 
 type RouteParams = {
   id: string;
@@ -139,7 +140,7 @@ export const AdDetails = (): ReactElement => {
             id={product.id}
             title={product.name}
             description={product.description}
-            price={product.price.toString()}
+            price={product.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
             isNew={product.is_new}
             acceptTrade={product.accept_trade}
             productImgs={product.product_images}
@@ -163,7 +164,7 @@ export const AdDetails = (): ReactElement => {
             </Heading>
 
             <Heading fontFamily="heading" fontSize="xl" color="blue.7">
-              {product.price}
+              {product.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
             </Heading>
           </HStack>
 

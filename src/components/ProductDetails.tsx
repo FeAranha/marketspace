@@ -88,7 +88,6 @@ export function ProductDetails({
             {isNew ? "NOVO" : "USADO"}
           </Text>
         </Box>
-        {/* API dados produto */}
         <HStack mt={2} alignItems="center" justifyContent="space-between">
           <Heading fontFamily="heading" fontSize="lg" color="gray.1">
             {title}

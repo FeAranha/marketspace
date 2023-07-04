@@ -27,6 +27,9 @@ import { ProductDTO } from "@dtos/ProductDTO";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
 import { Loading } from "@components/Loading";
+import { IPaymentMethods } from "src/interfaces/IPaymentMethods";
+import { IProduct } from "src/interfaces/IProduct";
+import { ProductMap } from "../mappers/ProductMap";
 
 export function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +41,8 @@ export function Home() {
   const [isNew, setisNew] = useState(true);
   const [product, setProduct] = useState<ProductDTO[]>([]);
   const [numberOfAds, setNumberOfAds] = useState(0);
+  const [paymentMethods, setPaymentMethods] = useState<IPaymentMethods[]>([]);
+  const [data, setData] = useState<IProduct[]>([] as IProduct[]);
 
   const toast = useToast();
 
@@ -49,8 +54,27 @@ export function Home() {
     setisNew(!isNew);
   }
 
-  function handleSearch() {
-    console.log("searchAD:", searchAd);
+  async function handleSearchAD() {
+    try {
+      setIsLoading(true);
+      let filter = `?query=${searchAd}`;
+
+      const { data } = await api.get(`/products${filter}`);
+      setProduct(data);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível carregar o anúncio. Tente novamente mais tarde.';
+
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   useFocusEffect(
@@ -58,10 +82,11 @@ export function Home() {
       const loadData = async () => {
         try {
           const productsData = await api.get("/users/products");
-          const generalProductsData = await api.get("/products");
           const activeProducts = productsData.data.filter((product) => product.is_active);
-          setProduct(generalProductsData.data);
           setNumberOfAds(activeProducts.length);
+          
+          const generalProductsData = await api.get("/products");
+          setProduct(generalProductsData.data);         
         } catch (error) {
           const isAppError = error instanceof AppError;
           const title = isAppError
@@ -107,7 +132,6 @@ export function Home() {
                 justifyContent="space-between"
               >
                 <Icon as={<Octicons name="tag" />} size={6} color="blue.7" />
-                {/* API count AD ativos */}
                 <VStack>
                   <Heading fontFamily="heading" fontSize="lg" color="gray.2">
                     {numberOfAds}
@@ -241,7 +265,6 @@ export function Home() {
                     size="lg"
                     onChange={() => setAcceptTrade(!acceptTrade)}
                   />
-                  {/* ⚛ Meios Pag */}
                   <Heading
                     mt={2}
                     fontFamily="heading"
@@ -286,20 +309,7 @@ export function Home() {
                 <Modal.Footer>
                   <Button
                     flex="1"
-                    onPress={() => {
-                      setModalVisible(false);
-                      console.log(
-                        "filtro => ",
-                        "Novo:",
-                        isNew,
-                        ", Trocavél:",
-                        acceptTrade,
-                        ", Meios de pagamentos: ",
-                        groupValues,
-                        "Buscar anúncio por: ",
-                        searchAd
-                      );
-                    }}
+                    //onPress={fetchFilteredProducts}
                   >
                     {/* TODO filtro: terminar Bottom */}
                     Aplicar filtro
@@ -311,12 +321,13 @@ export function Home() {
             <Input
               onChangeText={setSearchAd}
               value={searchAd}
+              onSubmitEditing={handleSearchAD}
               mt={3}
               mb={6}
               placeholder="Buscar anúncio"
               InputRightElement={
                 <HStack>
-                  <TouchableOpacity onPress={handleSearch}>
+                  <TouchableOpacity onPress={handleSearchAD}>
                     <Icon
                       as={<FontAwesome name="search" />}
                       size={5}

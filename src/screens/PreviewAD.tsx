@@ -37,10 +37,13 @@ export function PreviewAD() {
   const route = useRoute();
 
   const params = route.params as IProduct & { imagesToDelete: string[] };
-
+  
   const handleGoEditAd = () => {
-      navigation.navigate("editad");
+    navigation.navigate("editad",{
+       id: params?.id as string
+      });
   };
+
   async function handlePublish() {
     try {
       setIsLoading(true);
@@ -125,9 +128,8 @@ export function PreviewAD() {
           },
         });
       }
-      await fetchUserProducts()
-      navigation.navigate('myaddetails', { id: params.id as string });
-
+      await fetchUserProducts();
+      navigation.navigate("myaddetails", { id: params.id as string });
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
@@ -147,7 +149,7 @@ export function PreviewAD() {
   }
 
   const width = Dimensions.get("window").width;
-console.log('id prod=>', params.id)
+  console.log("id prod=>", params.id);
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
@@ -226,7 +228,7 @@ console.log('id prod=>', params.id)
                 R${""}
               </Heading>
               <Heading fontFamily="heading" fontSize="lg" color="blue.5">
-              {toMaskedPrice(String(params.price))}
+                {toMaskedPrice(String(params.price))}
                 {}
               </Heading>
             </HStack>
@@ -278,4 +280,4 @@ console.log('id prod=>', params.id)
       </Stack>
     </ScrollView>
   );
-};
+}

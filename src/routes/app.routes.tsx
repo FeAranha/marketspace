@@ -16,6 +16,7 @@ import ADSvg from "@assets/AD.svg";
 import LogoffSvg from "@assets/logout.svg";
 import { useTheme } from "native-base";
 import { IProduct } from "src/interfaces/IProduct";
+import { string } from "yup";
 
 type AppRoutes = {
   home: undefined;
@@ -31,7 +32,8 @@ type AppRoutes = {
   myaddetails: {
     id: string;
   };
-  editad: undefined | IProduct;
+  editad: IProduct;
+
 };
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRoutes>;
