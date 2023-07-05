@@ -29,7 +29,7 @@ import { toMaskedPrice } from "@utils/Masks";
 
 export function PreviewAD() {
   const [isLoading, setIsLoading] = useState(false);
-  const navigation = useNavigation<AppNavigatorRoutesProps>();
+  const { navigate, goBack } = useNavigation<AppNavigatorRoutesProps>();
   const { user, fetchUserProducts } = useAuth();
 
   const toast = useToast();
@@ -37,12 +37,10 @@ export function PreviewAD() {
   const route = useRoute();
 
   const params = route.params as IProduct & { imagesToDelete: string[] };
-  
-  const handleGoEditAd = () => {
-    navigation.navigate("editad",{
-       id: params?.id as string
-      });
-  };
+
+  function handleGoEditAd() {
+    goBack();
+  }
 
   async function handlePublish() {
     try {
@@ -70,7 +68,7 @@ export function PreviewAD() {
       });
       await fetchUserProducts();
 
-      navigation.navigate("myaddetails", { id: data.id });
+      navigate("myaddetails", { id: data.id });
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
@@ -129,7 +127,7 @@ export function PreviewAD() {
         });
       }
       await fetchUserProducts();
-      navigation.navigate("myaddetails", { id: params.id as string });
+      navigate("myaddetails", { id: params.id as string });
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
@@ -149,7 +147,6 @@ export function PreviewAD() {
   }
 
   const width = Dimensions.get("window").width;
-  console.log("id prod=>", params.id);
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}

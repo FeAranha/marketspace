@@ -38,7 +38,6 @@ export function ProductCard({
       navigation.navigate("addetails", { id });
     } else {
       const productId: string = id as string;
-      console.log('id esperado =>',productId)
       navigation.navigate("myaddetails", { id: productId });
     }
   }

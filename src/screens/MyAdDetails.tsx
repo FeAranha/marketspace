@@ -47,10 +47,6 @@ export const MyAdDetails = (): ReactElement => {
 
   const handleGoEditAd = () => {
     navigation.navigate("editad", data)
-    console.log('data for edit=> ', data,
-    'id=>', data.id,
-    'params ID:', params.id
-    )
   };
 
   async function handleChangeActive() {
@@ -121,10 +117,6 @@ export const MyAdDetails = (): ReactElement => {
 
       setData(ProductMap.toIProduct(data));
       setAdActive(data.is_active)
-      console.log('myadsDetails data=> ', data,
-      '----------------',
-      data.id
-      )
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
@@ -144,7 +136,6 @@ export const MyAdDetails = (): ReactElement => {
   useFocusEffect(
     useCallback(() => {
       fetchData();
-      console.log('fix', id)
     }, [id])
   );
 
